@@ -71,7 +71,7 @@ def obtener_datos(inicio, fin,
         data_fred = None
 
 
-    # cargar los datos de FRED en la base de datos mysql
+    # cargar los datos de FRED en la base de datos mysql serie a serie
     from carga_fred import cargar_datos_fred
     for series in data_fred:
         try:
