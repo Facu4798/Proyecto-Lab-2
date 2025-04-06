@@ -1,8 +1,12 @@
 
-from carga import cargar_datos
 
 
-def obtener_datos(inicio, fin,user='root', password='password',port=3306, host='localhost'):
+def obtener_datos(inicio, fin,
+                  ticker='TSLA',
+                  user='root', 
+                  password='password',
+                  port=3306,
+                  host='localhost'):
     """
     Esta función obtiene datos de Yahoo Finance para un rango de fechas específico e
     ingesta los datos en una base de datos MySQL.
@@ -13,6 +17,7 @@ def obtener_datos(inicio, fin,user='root', password='password',port=3306, host='
     - **password:** str, contraseña de MySQL (default='password')
     - **port:** int, puerto de MySQL (default=3306)
     - **host:** str, host de MySQL (default='localhost')
+    - **ticker:** str, ticker de la acción (default='TSLA')
     **Retorna:**
     - **data:** DataFrame con los datos descargados de Yahoo Finance
     """  
@@ -62,14 +67,15 @@ def obtener_datos(inicio, fin,user='root', password='password',port=3306, host='
     # Descargar datos de Yahoo Finance
     try:
         # Descargar datos de Yahoo Finance
-        data = yf.download('TSLA', start=inicio, end=fin,interval='1d')
+        data = yf.download(ticker, start=inicio, end=fin,interval='1d')
         if data.empty:
             raise ValueError("No data found for the given date.")
-        return data
+        
         #ingestar a base de datos mysql
-
         from carga import cargar_datos
-        cargar_datos(data,user=user,password=password,port=port,host=host)
+        cargar_datos(data,ticker=ticker,user=user,password=password,port=port,host=host)
+
+        return data
 
     except Exception as e:
         print(f"Error downloading data: {e}")
