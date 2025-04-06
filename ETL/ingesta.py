@@ -64,6 +64,13 @@ def obtener_datos(inicio, fin,
         os.system('pip install yfinance --upgrade')
         import yfinance as yf
 
+    #validacion de fechas
+    if not isinstance(inicio, str) or not isinstance(fin, str):
+        raise ValueError("Las fechas deben ser cadenas en formato 'YYYY-MM-DD'")
+    if inicio >= fin:
+        raise ValueError("La fecha de inicio debe ser menor que la fecha de fin")
+
+
     # Descargar datos de Yahoo Finance
     try:
         # Descargar datos de Yahoo Finance
@@ -81,16 +88,3 @@ def obtener_datos(inicio, fin,
         print(f"Error downloading data: {e}")
         return None
 
-
-
-
-
-#obtener la fecha de hoy
-from datetime import datetime
-#today = datetime.now().strftime('%Y-%m-%d')
-ini= "2025-04-01"
-fin= "2025-04-02"
-data = obtener_datos(ini,fin)
-
-print(data)
-      
