@@ -33,22 +33,6 @@ def obtener_datos(inicio, fin,
         os.system('pip install pandas')
         import pandas as pd
 
-    # importar requests html
-    try:
-        from requests_html import HTMLSession
-    except:
-        import os
-        os.system('pip install requests-html')
-        from requests_html import HTMLSession
-
-
-    #importar yahoo finance de yfinance
-    try:
-        import yfinance as yf
-    except:
-        import os
-        os.system('pip install yfinance --upgrade')
-        import yfinance as yf
 
     #validacion de fechas
     if not isinstance(inicio, str) or not isinstance(fin, str):
@@ -56,24 +40,50 @@ def obtener_datos(inicio, fin,
     if inicio >= fin:
         raise ValueError("La fecha de inicio debe ser menor que la fecha de fin")
 
-
-    # Descargar datos de Yahoo Finance
+    #ingestar los datos de yahoo finance
+    from ingesta_yahoo import obtener_datos_yahoo
     try:
-        # Descargar datos de Yahoo Finance
-        data = yf.download(ticker, start=inicio, end=fin,interval='1d')
-        if data.empty:
-            raise ValueError("No data found for the given date.")
-        
-        #ingestar a base de datos mysql
-        from carga import cargar_datos
+        data_yahoo = obtener_datos_yahoo(
+            ticker=ticker,
+            inicio=inicio,
+            fin=fin,
+            user=user, 
+            password=password,
+            port=port,
+            host=host
+        )
+    except:
+        print("Error al obtener datos de Yahoo Finance")
+        data_yahoo = None
+
+    #cargar los datos de yahoo a la base de datos mysql
+
+
+
+
+
+    #ingestar los datos de FRED
+    from ingesta_fred import obtener_datos_fred
+    try:
+        data_fred = obtener_datos_fred()
+    except:
+        print("error al obtener datos de FRED")
+        data_fred = None
+
+
+    # cargar los datos de FRED en la base de datos mysql
+    from carga_fred import cargar_datos_fred
+    for series in data_fred:
         try:
-            cargar_datos(data,ticker=ticker,user=user,password=password,port=port,host=host)
-        except:
-            print("Error al cargar los datos a la base de datos MySQL")
+            cargar_datos_fred(data=series,
+                              user=user,
+                              password=password,
+                              port=port,
+                              host=host,
+                              series =series.columns[0])
+        except Exception as e:
+            print(f"Error al cargar datos de FRED a la base de datos MySQL: {e}")
+            # Continuar con el siguiente conjunto de datos
+            continue
 
-        return data
-
-    except Exception as e:
-        print(f"Error downloading data: {e}")
-        return None
-
+    return {"datos yahoo": data_yahoo,"datos_fred":data_fred}

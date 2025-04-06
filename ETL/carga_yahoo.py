@@ -1,11 +1,11 @@
-def cargar_datos(data,
+def cargar_datos_yahoo(data,
                  user = 'root',
                  password = 'password',
                  port=3306, 
                  host='localhost',
                  ticker='TSLA'):
     """
-    Esta función carga los datos a la base de datos MySQL 
+    Esta función carga los datos de yahoo a la base de datos MySQL 
     **Parámetros:**
     - **data:** DataFrame, datos a cargar en la base de datos
     - **user:** str, usuario de MySQL (default='root')
