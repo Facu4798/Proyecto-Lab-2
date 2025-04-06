@@ -66,7 +66,10 @@ def obtener_datos(inicio, fin,
         
         #ingestar a base de datos mysql
         from carga import cargar_datos
-        cargar_datos(data,ticker=ticker,user=user,password=password,port=port,host=host)
+        try:
+            cargar_datos(data,ticker=ticker,user=user,password=password,port=port,host=host)
+        except:
+            print("Error al cargar los datos a la base de datos MySQL")
 
         return data
 
