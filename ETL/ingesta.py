@@ -41,20 +41,6 @@ def obtener_datos(inicio, fin,
         os.system('pip install requests-html')
         from requests_html import HTMLSession
 
-    """
-    importar yahoo finance de yahoo_fin FIX
-    try:
-        import yahoo_fin as yf
-    except:
-        import os
-        os.system('pip install yahoo_fin --upgrade')
-        import yahoo_fin as yf
-
-    # Descargar datos de Yahoo Finance
-    from yahoo_fin.stock_info import get_stats
-    data = get_stats('amzn')
-    return data
-    """
 
     #importar yahoo finance de yfinance
     try:
