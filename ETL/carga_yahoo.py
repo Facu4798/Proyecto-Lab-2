@@ -32,6 +32,7 @@ def cargar_datos_yahoo(data,
             database='finance_db'
         )
 
+
         if connection.is_connected():
                 cursor = connection.cursor()
                 cursor.execute("USE finance_db")
