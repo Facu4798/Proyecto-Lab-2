@@ -45,8 +45,8 @@ def obtener_datos(inicio, fin,
     try:
         data_yahoo = obtener_datos_yahoo(
             ticker=ticker,
-            inicio=inicio,
-            fin=fin,
+            start=inicio,
+            end=fin,
             user=user, 
             password=password,
             port=port,
@@ -65,7 +65,8 @@ def obtener_datos(inicio, fin,
     #ingestar los datos de FRED
     from ingesta_fred import obtener_datos_fred
     try:
-        data_fred = obtener_datos_fred()
+        data_fred = obtener_datos_fred(start=inicio,
+                                       end=fin)
     except:
         print("error al obtener datos de FRED")
         data_fred = None
@@ -73,18 +74,15 @@ def obtener_datos(inicio, fin,
 
     # cargar los datos de FRED en la base de datos mysql serie a serie
     from carga_fred import cargar_datos_fred
-    for series in data_fred:
         try:
-            cargar_datos_fred(data=series,
-                              user=user,
-                              password=password,
-                              port=port,
-                              host=host,
-                              series =series.columns[0])
+            cargar_datos_fred(data=data_fred,
+                                user=user,
+                                password=password,
+                                port=port,
+                                host=host)
         except Exception as e:
             print(f"Error al cargar datos de FRED a la base de datos MySQL: {e}")
             # Continuar con el siguiente conjunto de datos
-            continue
 
     return {"datos yahoo": data_yahoo,"datos_fred":data_fred}
 
