@@ -74,15 +74,15 @@ def obtener_datos(inicio, fin,
 
     # cargar los datos de FRED en la base de datos mysql serie a serie
     from carga_fred import cargar_datos_fred
-        try:
-            cargar_datos_fred(data=data_fred,
-                                user=user,
-                                password=password,
-                                port=port,
-                                host=host)
-        except Exception as e:
-            print(f"Error al cargar datos de FRED a la base de datos MySQL: {e}")
-            # Continuar con el siguiente conjunto de datos
+    try:
+        cargar_datos_fred(data=data_fred,
+                            user=user,
+                            password=password,
+                            port=port,
+                            host=host)
+    except Exception as e:
+        print(f"Error al cargar datos de FRED a la base de datos MySQL: {e}")
+        # Continuar con el siguiente conjunto de datos
 
     return {"datos yahoo": data_yahoo,"datos_fred":data_fred}
 
