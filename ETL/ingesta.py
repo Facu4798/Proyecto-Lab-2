@@ -34,10 +34,12 @@ def obtener_datos(inicio, fin,
         import pandas as pd
 
 
-    #validacion de fechas
-    if not isinstance(inicio, str) or not isinstance(fin, str):
+    #validacion de fecha
+    if inicio is None or fin is None:
+        pass
+    elif not isinstance(inicio, str) or not isinstance(fin, str):
         raise ValueError("Las fechas deben ser cadenas en formato 'YYYY-MM-DD'")
-    if inicio >= fin:
+    elif inicio >= fin:
         raise ValueError("La fecha de inicio debe ser menor que la fecha de fin")
 
     #ingestar los datos de yahoo finance
