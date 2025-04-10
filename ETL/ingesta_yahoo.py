@@ -35,9 +35,9 @@ def obtener_datos_yahoo(start=None, end=None,
         data.index = [i for i in data.index]
 
         #ingestar a base de datos mysql
-        from carga_yahoo import cargar_datos_yahoo
+        from ingesta_yahoo import cargar_datos_yahoo
         try:
-            cargar_datos(data,ticker=ticker,user=user,password=password,port=port,host=host)
+            cargar_datos_yahoo(data,ticker=ticker,user=user,password=password,port=port,host=host)
         except:
             print("Error al cargar los datos a la base de datos MySQL")
 
