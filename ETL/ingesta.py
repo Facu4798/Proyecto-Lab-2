@@ -87,3 +87,7 @@ def obtener_datos(inicio, fin,
             continue
 
     return {"datos yahoo": data_yahoo,"datos_fred":data_fred}
+
+
+datos = obtener_datos(inicio='2023-01-01', fin='2023-12-31', ticker='TSLA')
+print(datos)

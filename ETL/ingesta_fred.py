@@ -50,18 +50,8 @@ def obtener_datos_fred(inicators = {
             print(f"Error al obtener datos para el indicador {ind}: {e}")
             # En caso de error, continuar con el siguiente indicador
             continue
-    
-    
-    # # Unir todos los DataFrames por el índice (fecha)
-    # for i in range(1,len(data_frames)):
-    #     try:
-    #         data_frames[0] = data_frames[0].join(data_frames[i], how='outer')
-    #     except Exception as e:
-    #         print(f"Error al unir DataFrame {i}: {e}")
-    #         continue
-    # if len(data_frames) == 0:
-    #     print("No se pudieron obtener datos de FRED para ninguno de los indicadores.")
-    #     return None
+        
     
     # Devolver el DataFrame combinado
     return data_frames
+

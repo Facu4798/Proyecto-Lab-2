@@ -1,8 +1,7 @@
 def cargar_datos_fred(data,user='root',
                       password='password',
                      port=3306, 
-                     host='localhost',
-                     series = "GDP"):
+                     host='localhost'):
 
     """
     Esta función carga los datos de FRED a la base de datos MySQL
@@ -56,18 +55,20 @@ def cargar_datos_fred(data,user='root',
                 """)
                 connection.commit()
 
-                # Cargar los datos en la tabla macro_data
-                for index, row in data.iterrows():
-                    try:
-                        # Insertar cada fila en la tabla
-                        cursor.execute("""
-                            INSERT INTO macro_data (date, value, series)
-                            VALUES (%s, %s, %s)
-                            ON DUPLICATE KEY UPDATE value = VALUES(value)
-                        """, (index.strftime('%Y-%m-%d'), row[series], series))
-                    except Exception as e:
-                        print(f"Error al insertar fila {index}: {e}")
-                        continue
+                for df in data:
+                    # Cargar los datos en la tabla macro_data
+                    series = data.columns[0]
+                    for index, row in df.iterrows():
+                        try:
+                            # Insertar cada fila en la tabla
+                            cursor.execute("""
+                                INSERT INTO macro_data (date, value, series)
+                                VALUES (%s, %s, %s)
+                                ON DUPLICATE KEY UPDATE value = VALUES(value)
+                            """, (index.strftime('%Y-%m-%d'), row[series], series))
+                        except Exception as e:
+                            print(f"Error al insertar fila {index}: {e}")
+                            continue
 
 
     except:
