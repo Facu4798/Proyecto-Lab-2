@@ -1,4 +1,4 @@
-def obtener_datos_yahoo(inicio, fin,
+def obtener_datos_yahoo(start=None, end=None,
                         ticker='TSLA',
                         user='root',
                         password='password',
