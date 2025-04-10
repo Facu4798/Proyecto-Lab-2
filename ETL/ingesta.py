@@ -80,12 +80,8 @@ def obtener_datos(inicio, fin,
                             password=password,
                             port=port,
                             host=host)
-    except Exception as e:
-        print(f"Error al cargar datos de FRED a la base de datos MySQL: {e}")
+    except Exception:
+        print(f"Error al cargar datos de FRED a la base de datos MySQL")
         # Continuar con el siguiente conjunto de datos
 
     return {"datos yahoo": data_yahoo,"datos_fred":data_fred}
-
-
-datos = obtener_datos(inicio='2023-01-01', fin='2023-12-31', ticker='TSLA')
-print(datos)
