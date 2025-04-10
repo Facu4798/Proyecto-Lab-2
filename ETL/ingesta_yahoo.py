@@ -25,7 +25,7 @@ def obtener_datos_yahoo(start=None, end=None,
     # Descargar datos de Yahoo Finance
     try:
         # Descargar datos de Yahoo Finance
-        data = yf.download(ticker, start=inicio, end=fin,interval='1d')
+        data = yf.download(ticker, start=start, end=end,interval='1d')
         if data.empty:
             raise ValueError("No data found for the given date.")
         
