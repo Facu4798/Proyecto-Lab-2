@@ -11,4 +11,7 @@ inner join (
            date
     from stock_data)
     on stock_data.date = stock_data.date
-    
+inner join macro_data on 
+    month(stock_data.date) = month(macro_data.date) and
+    year(stock_data.date) = year(macro_data.date)
+
