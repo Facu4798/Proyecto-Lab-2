@@ -1,25 +1,10 @@
 
-def obtener_datos(inicio=None, fin=None,
-                  ticker='TSLA',
-                  user='root', 
-                  password='password',
-                  port=3306,
-                  host='localhost',
-                  database='risk-estimate-dl'):
-    """
-    Esta función obtiene datos de Yahoo Finance para un rango de fechas específico e
-    ingesta los datos en una base de datos MySQL.
-    **Parámetros:**
-    - **inicio:** str, fecha de inicio en formato 'YYYY-MM-DD'
-    - **fin:** str, fecha de fin en formato 'YYYY-MM-DD'
-    - **user:** str, usuario de MySQL (default='root')
-    - **password:** str, contraseña de MySQL (default='password')
-    - **port:** int, puerto de MySQL (default=3306)
-    - **host:** str, host de MySQL (default='localhost')
-    - **ticker:** str, ticker de la acción (default='TSLA')
-    **Retorna:**
-    - **data:** DataFrame con los datos descargados de Yahoo Finance
-    """  
+
+from la_libreria.authentication import Credentials
+from la_libreria.connectors import MySQLConnector
+from la_libreria.utils import get_ts
+
+def obtener_datos(inicio=None, fin=None, ticker='TSLA',credentials=None):
     import io
     import requests
     import ftplib
@@ -32,7 +17,6 @@ def obtener_datos(inicio=None, fin=None,
         os.system('pip install pandas')
         import pandas as pd
 
-
     #validacion de fecha
     if inicio is None or fin is None:
         pass
@@ -40,6 +24,10 @@ def obtener_datos(inicio=None, fin=None,
         raise ValueError("Las fechas deben ser cadenas en formato 'YYYY-MM-DD'")
     elif inicio >= fin:
         raise ValueError("La fecha de inicio debe ser menor que la fecha de fin")
+    
+    etl_ts = get_ts()
+
+
 
     #ingestar los datos de yahoo finance
     from ingesta_yahoo import obtener_datos_yahoo
@@ -48,45 +36,85 @@ def obtener_datos(inicio=None, fin=None,
         start=inicio,
         end=fin,
     )
-    
-
-    #cargar los datos de yahoo a la base de datos mysql
-
-    from carga_yahoo import cargar_datos_yahoo
-    cargar_datos_yahoo(data=data_yahoo,
-                        user=user,
-                        password=password,
-                        port=port,
-                        host=host,
-                        ticker=ticker)
-
+    data_yahoo["Ticker"]=ticker
+    data_yahoo = data_yahoo.reset_index()
+    data_yahoo = data_yahoo.rename(columns={"index":"Date"})
+    data_yahoo = data_yahoo[["Date","Ticker","Open","High","Low","Close","Volume"]]
+    data_yahoo["etl_ts"] = etl_ts
 
     #ingestar los datos de FRED
     from ingesta_fred import obtener_datos_fred
-    data_fred = obtener_datos_fred(start=inicio,
-                                       end=fin)
+    data_fred = obtener_datos_fred(
+        start=inicio,
+        end=fin
+        )
+    data_fred = [df.reset_index() for df in data_fred]
+    data_fred = [df.rename(columns={"index":"Date"}) for df in data_fred]
+    for df in data_fred:
+        df["Series"] = df.columns[1]
+    data_fred = [df.rename(columns={df.columns[1]:"Value"}) for df in data_fred]
+    data_fred = pd.concat(data_fred,axis=0)
+    data_fred["etl_ts"] = etl_ts
+
+    conn = MySQLConnector(credentials.dict)
+    conn.test_connection()
+    conn.connect()
+
+    try:
+        conn.create_table(
+            data=data_yahoo,
+            table_name="stock_data",
+            pks=["Date","Ticker"],
+            exceptions={"Volume":"BIGINT"}
+        )
+    except:
+        pass
+
+    try:
+        conn.create_table(
+            data=data_fred,
+            table_name="macro_data",
+            pks=["Date","Series"],
+            exceptions={}
+        )
+    except:
+        pass
+
+    conn.insert_data(
+        data=data_yahoo,
+        table_name="stock_data",
+        pks=["Date","Ticker"]
+    )
+    
+    conn.insert_data(
+        data = data_fred,
+        table_name="macro_data",
+        pks=["Date","Series"]
+    )
+
+    conn.insert_data(
+        pd.DataFrame({"date":[etl_ts],"description":[f"sor_to_rdz {ticker}"]}),
+        table_name="cdc",
+        pks=["description"]
+    )
+
+    conn.close()
 
 
-    # cargar los datos de FRED en la base de datos mysql serie a serie
-    from carga_fred import cargar_datos_fred
-    cargar_datos_fred(data=data_fred,
-                            user=user,
-                            password=password,
-                            port=port,
-                            host=host,
-                            database=database)
 
-    return {"datos yahoo": data_yahoo,"datos_fred":data_fred}
+creds = Credentials().load(path="/workspaces/Proyecto-Lab-2/Credentials/db_prod.json")
 
-import pandas as pd
-from datetime import datetime
-today = datetime.today().strftime('%Y-%m-%d')
-tomorrow = (datetime.today() + pd.DateOffset(days=1)).strftime('%Y-%m-%d')
-
-obtener_datos(inicio=None,fin=None
-            ,ticker='^GSPC',
-            host="estrie01-estimacionderiego1.j.aivencloud.com",
-            user="avnadmin",
-            password="AVNS_vBt5bLw5TLinvY6G_Eo",
-            port=24195,
-            database="defaultdb")
+from cdc import get_cdc_date
+cdc_date = get_cdc_date("sor_to_rdz ^GSPC")
+if cdc_date is not None:
+    from la_libreria.utils import substract_date
+    cdc_date = substract_date(str(cdc_date),interval="d",amount=1)
+try:
+    obtener_datos(
+        inicio=cdc_date,
+        fin=None, 
+        ticker='^GSPC',
+        credentials = creds
+    )
+except Exception as e:
+    print("Error al obtener datos de ^GSPC:", e)
