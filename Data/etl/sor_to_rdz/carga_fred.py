@@ -70,20 +70,3 @@ def cargar_datos_fred(inicio=None, fin=None, credentials=None):
 
     conn.close()
 
-
-
-# creds = Credentials().load(path="/workspaces/Proyecto-Lab-2/Credentials/db_prod.json")
-
-# from cdc import get_cdc_date
-# cdc_date = get_cdc_date("sor_to_rdz fred")
-# if cdc_date is not None:
-#     from la_libreria.utils import substract_date
-#     cdc_date = substract_date(str(cdc_date),interval="d",amount=1)
-# try:
-#     cargar_datos_fred(
-#         inicio=None,
-#         fin=None, 
-#         credentials = creds
-#     )
-# except Exception as e:
-#     print("Error al obtener datos de fred:", e)
