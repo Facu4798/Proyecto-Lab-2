@@ -73,19 +73,19 @@ def cargar_datos_yahoo(inicio=None, fin=None, ticker='TSLA',credentials=None):
 
 
 
-creds = Credentials().load(path="/workspaces/Proyecto-Lab-2/Credentials/db_prod.json")
+# creds = Credentials().load(path="/workspaces/Proyecto-Lab-2/Credentials/db_prod.json")
 
-from cdc import get_cdc_date
-cdc_date = get_cdc_date("sor_to_rdz ^GSPC")
-if cdc_date is not None:
-    from la_libreria.utils import substract_date
-    cdc_date = substract_date(str(cdc_date),interval="d",amount=1)
-try:
-    cargar_datos_yahoo(
-        inicio=cdc_date,
-        fin=None, 
-        ticker='^GSPC',
-        credentials = creds
-    )
-except Exception as e:
-    print("Error al obtener datos de ^GSPC:", e)
+# from cdc import get_cdc_date
+# cdc_date = get_cdc_date("sor_to_rdz ^GSPC")
+# if cdc_date is not None:
+#     from la_libreria.utils import substract_date
+#     cdc_date = substract_date(str(cdc_date),interval="d",amount=1)
+# try:
+#     cargar_datos_yahoo(
+#         inicio=cdc_date,
+#         fin=None, 
+#         ticker='^GSPC',
+#         credentials = creds
+#     )
+# except Exception as e:
+#     print("Error al obtener datos de ^GSPC:", e)

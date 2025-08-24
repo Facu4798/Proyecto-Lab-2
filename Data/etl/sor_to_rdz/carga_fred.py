@@ -61,7 +61,7 @@ def cargar_datos_fred(inicio=None, fin=None, credentials=None):
         pks=["Date","Series"]
     )
 
-    last_date = data_fred["Date"].max().strftime("%Y-%m-%d")
+    last_date = data_fred["Date"].min().strftime("%Y-%m-%d")
     conn.insert_data(
         pd.DataFrame({"date":[last_date],"description":[f"sor_to_rdz fred"]}),
         table_name="cdc",
@@ -72,18 +72,18 @@ def cargar_datos_fred(inicio=None, fin=None, credentials=None):
 
 
 
-creds = Credentials().load(path="/workspaces/Proyecto-Lab-2/Credentials/db_prod.json")
+# creds = Credentials().load(path="/workspaces/Proyecto-Lab-2/Credentials/db_prod.json")
 
-from cdc import get_cdc_date
-cdc_date = get_cdc_date("sor_to_rdz fred")
-if cdc_date is not None:
-    from la_libreria.utils import substract_date
-    cdc_date = substract_date(str(cdc_date),interval="d",amount=1)
-try:
-    cargar_datos_fred(
-        inicio=None,
-        fin=None, 
-        credentials = creds
-    )
-except Exception as e:
-    print("Error al obtener datos de fred:", e)
+# from cdc import get_cdc_date
+# cdc_date = get_cdc_date("sor_to_rdz fred")
+# if cdc_date is not None:
+#     from la_libreria.utils import substract_date
+#     cdc_date = substract_date(str(cdc_date),interval="d",amount=1)
+# try:
+#     cargar_datos_fred(
+#         inicio=None,
+#         fin=None, 
+#         credentials = creds
+#     )
+# except Exception as e:
+#     print("Error al obtener datos de fred:", e)
