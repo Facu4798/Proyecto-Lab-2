@@ -1,27 +1,13 @@
-def cargar_datos_fred(data,user='root',
-                      password='password',
-                     port=3306, 
-                     host='localhost',
-                     database='defaultdb'):
 
-    """
-    Esta función carga los datos de FRED a la base de datos MySQL
-    **Parámetros:**
-    - **data:** DataFrame, datos a cargar en la base de datos
-    - **user:** str, usuario de MySQL (default='root')
-    - **password:** str, contraseña de MySQL (default='password')
-    - **port:** int, puerto de MySQL (default=3306)
-    - **host:** str, host de MySQL (default='localhost')
-    """
 
-    #importar mysql connector
-    try:
-        import mysql.connector
-    except:
-        import os
-        os.system('pip install mysql-connector-python')
-        import mysql.connector
+from la_libreria.authentication import Credentials
+from la_libreria.connectors import MySQLConnector
+from la_libreria.utils import get_ts
 
+def cargar_datos_fred(inicio=None, fin=None, credentials=None):
+    import io
+    import requests
+    import ftplib
 
     #importar pandas
     try:
@@ -31,65 +17,73 @@ def cargar_datos_fred(data,user='root',
         os.system('pip install pandas')
         import pandas as pd
 
-    #try:
-    connection = mysql.connector.connect(
-        host=host,
-        user=user,
-        password=password,
-        port=port,
-        database=database
+    #validacion de fecha
+    if inicio is None or fin is None:
+        pass
+    elif not isinstance(inicio, str) or not isinstance(fin, str):
+        raise ValueError("Las fechas deben ser cadenas en formato 'YYYY-MM-DD'")
+    elif inicio >= fin:
+        raise ValueError("La fecha de inicio debe ser menor que la fecha de fin")
+    
+    etl_ts = get_ts()
+
+    #ingestar los datos de FRED
+    from ingesta_fred import obtener_datos_fred
+    data_fred = obtener_datos_fred(
+        start=inicio,
+        end=fin
+        )
+    data_fred = [df.reset_index() for df in data_fred]
+    data_fred = [df.rename(columns={"index":"Date"}) for df in data_fred]
+    for df in data_fred:
+        df["Series"] = df.columns[1]
+    data_fred = [df.rename(columns={df.columns[1]:"Value"}) for df in data_fred]
+    data_fred = pd.concat(data_fred,axis=0)
+    data_fred["etl_ts"] = etl_ts
+
+    conn = MySQLConnector(credentials.dict)
+    conn.test_connection()
+    conn.connect()
+
+    try:
+        conn.create_table(
+            data=data_fred,
+            table_name="macro_data",
+            pks=["Date","Series"],
+            exceptions={}
+        )
+    except:
+        pass
+    
+    conn.insert_data(
+        data = data_fred,
+        table_name="macro_data",
+        pks=["Date","Series"]
     )
 
-    if connection.is_connected():
-            cursor = connection.cursor()
-            cursor.execute(f"USE {database}")
+    last_date = data_fred["Date"].max().strftime("%Y-%m-%d")
+    conn.insert_data(
+        pd.DataFrame({"date":[last_date],"description":[f"sor_to_rdz fred"]}),
+        table_name="cdc",
+        pks=["description"]
+    )
 
-            # Verificar que la tabla existe, si no crearla
-            cursor.execute(f"""
-                CREATE TABLE IF NOT EXISTS macro_data (
-                    Date DATE NOT NULL,
-                    Value FLOAT,
-                    Series VARCHAR(30),
-                    PRIMARY KEY (Date, Series)
-                )
-            """)
-            connection.commit()
-
-            for df in data:
-                # Cargar los datos en la tabla macro_data
-                series = df.columns[0]
-
-                sql_insert = """
-                            INSERT INTO macro_data (Date, Value, Series)
-                            VALUES (%s, %s, %s)
-                            ON DUPLICATE KEY UPDATE 
-                            Value = VALUES(Value)
-                            """
-                
-                df["Series"] = series
-
-                df = [
-                        tuple(None if pd.isna(value) else value for value in row)
-                        for row in df.itertuples(index=True, name=None)
-                    ]
-                connection.autocommit = True
-                cursor.executemany(sql_insert, df)
-                connection.commit()
+    conn.close()
 
 
-                    
-    # except:
-    #     print("Error al conectar a la base de datos MySQL")
-    #     return None
-    
-    # finally:
-    if connection.is_connected():
-        # cerrar cursor y conexión
-        try:
-            cursor.close()
-        except:
-            pass
-        try:
-            connection.close()
-        except:
-            pass
+
+creds = Credentials().load(path="/workspaces/Proyecto-Lab-2/Credentials/db_prod.json")
+
+from cdc import get_cdc_date
+cdc_date = get_cdc_date("sor_to_rdz fred")
+if cdc_date is not None:
+    from la_libreria.utils import substract_date
+    cdc_date = substract_date(str(cdc_date),interval="d",amount=1)
+try:
+    cargar_datos_fred(
+        inicio=None,
+        fin=None, 
+        credentials = creds
+    )
+except Exception as e:
+    print("Error al obtener datos de fred:", e)
