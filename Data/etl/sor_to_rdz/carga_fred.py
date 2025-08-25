@@ -61,7 +61,7 @@ def cargar_datos_fred(inicio=None, fin=None, credentials=None):
         pks=["Date","Series"]
     )
 
-    last_date = data_fred.groupby("Series").agg({"Date":"max"})['Date'].min().strftime("%Y-%m-%d")
+    last_date = data_fred.groupby("Series")["Date"].max().reset_index(drop=True).min().strftime("%Y-%m-%d")
     conn.insert_data(
         pd.DataFrame({"date":[last_date],"description":[f"sor_to_rdz fred"]}),
         table_name="cdc",
