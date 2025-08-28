@@ -40,6 +40,7 @@ def cargar_datos_fred(inicio=None, fin=None, credentials=None):
     data_fred = [df.rename(columns={df.columns[1]:"Value"}) for df in data_fred]
     data_fred = pd.concat(data_fred,axis=0)
     data_fred["etl_ts"] = etl_ts
+    data_fred.reset_index(drop=True,inplace=True)
 
     conn = MySQLConnector(credentials.dict)
     conn.test_connection()
@@ -55,11 +56,13 @@ def cargar_datos_fred(inicio=None, fin=None, credentials=None):
     except:
         pass
     
+    print(data_fred)
     conn.insert_data(
         data = data_fred,
         table_name="macro_data",
         pks=["Date","Series"]
     )
+
 
     last_date = data_fred.groupby("Series")["Date"].max().reset_index(drop=True).min().strftime("%Y-%m-%d")
     conn.insert_data(
