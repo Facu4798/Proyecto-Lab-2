@@ -43,6 +43,5 @@ El MVP debe ser simple pero funcional, mostrando valor rápidamente.
 |------------|------------|-----|
 |10-11|Como data scientist, quiero entrenar modelos alternativos TGARCH y EGARCH, para evaluar si mejoran la captura de shocks asimétricos y colas pesadas respecto a GARCH.|Imagen con metricas y diagnostico en Historia|
 |13|Como data machine learning engineer, quiero un sistema de monitoreo de pipelines y MAE, para asegurar que la ingesta, el entrenamiento y la performance del modelo se controlen de forma continua.|Pull Request|
-|5|Como machine learning engineer, quiero contar con un dashboard en PowerBI, donde pueda visualizar de forma clara el desempeño del modelo y métricas clave, para facilitar la toma de decisiones.
-|Pull request|
+|5| Como machine learning engineer, quiero contar con un dashboard en PowerBI, donde pueda visualizar de forma clara el desempeño del modelo y métricas clave, para facilitar la toma de decisiones.|Pull request|
 
