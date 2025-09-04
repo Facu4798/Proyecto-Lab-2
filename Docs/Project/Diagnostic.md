@@ -12,7 +12,6 @@
 - El análisis comparativo fue limitado: de todos los modelos probados el mejor fue el de regresión lineal
 - Los modelos de árboles fueron descartados por bajo rendimiento
 - no se pudo captar la volatilidad y por ende no se captaron los picos extremos, que en análisis de riesgo son críticos
-- 
 ## Oportunidades de mejora
 - Aplicación de modelos financieros (ej; ARIMA, GARCH, EGARCH, etc)
 - Robustecer la ingesta de datos con fuentes alternativas
