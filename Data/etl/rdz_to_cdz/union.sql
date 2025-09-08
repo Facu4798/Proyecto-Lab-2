@@ -16,7 +16,7 @@ SELECT
             (MinCloseOver10Days-src.close)/src.Close as Target10,
             (MinCloseOver5Days-src.Close)/src.Close as Target5,
             (MinCloseOver30Days-src.Close)/src.Close as Target30
-    FROM stock_data AS src
+    FROM stock_data AS src 
     INNER JOIN (
         SELECT  Date,
                 CASE
@@ -34,48 +34,48 @@ SELECT
                     THEN MIN(Close) OVER (ORDER BY date ASC ROWS BETWEEN 1 FOLLOWING AND UNBOUNDED FOLLOWING)
                     ELSE MIN(Close) OVER (ORDER BY date ASC ROWS BETWEEN 1 FOLLOWING AND 30 FOLLOWING)
                 END AS MinCloseOver30Days
-        FROM stock_data
+        FROM stock_data where Date >= date_placeholder  
         ) AS tar ON tar.Date = src.Date
     LEFT JOIN (
         SELECT  Date,
                 Value
         FROM macro_data
-        WHERE Series='CPIAUCSL' and Value IS NOT NULL
+        WHERE Series='CPIAUCSL' and Value IS NOT NULL and Date >= date_placeholder
         ) AS cpiaucsl ON cpiaucsl.Date = src.Date
     LEFT JOIN (
         SELECT  Date,
                 Value
         FROM macro_data
-        WHERE Series='UNRATE' and Value IS NOT NULL
+        WHERE Series='UNRATE' and Value IS NOT NULL and Date >= date_placeholder
         ) AS unrate ON unrate.Date = src.Date
     LEFT JOIN (
         SELECT  Date,
                 Value
         FROM macro_data
-        WHERE Series='INDPRO' and Value IS NOT NULL
+        WHERE Series='INDPRO' and Value IS NOT NULL and Date >= date_placeholder
         ) AS indpro ON indpro.Date = src.Date
     LEFT JOIN (
         SELECT  Date,
                 Value
         FROM macro_data
-        WHERE Series='FEDFUNDS' and Value IS NOT NULL
+        WHERE Series='FEDFUNDS' and Value IS NOT NULL and Date >= date_placeholder
         ) AS fedfunds ON fedfunds.Date = src.Date
     LEFT JOIN (
         SELECT  Date,
                 Value
         FROM macro_data
-        WHERE Series='DGS10' and Value IS NOT NULL
+        WHERE Series='DGS10' and Value IS NOT NULL and Date >= date_placeholder
         ) AS dgs10 ON dgs10.Date = src.Date
     LEFT JOIN (
         SELECT  Date,
                 Value
         FROM macro_data
-        WHERE Series='PCE' and Value IS NOT NULL
+        WHERE Series='PCE' and Value IS NOT NULL and Date >= date_placeholder
         ) AS pce ON pce.Date = src.Date
     LEFT JOIN (
         SELECT  Date,
                 Value
         FROM macro_data
-        WHERE Series='DFF' and Value IS NOT NULL
+        WHERE Series='DFF' and Value IS NOT NULL and Date >= date_placeholder
         ) AS dff ON dff.Date = src.Date
     ;
