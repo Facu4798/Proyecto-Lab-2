@@ -77,42 +77,101 @@ def predecir(modelo,
     # prediccion 5 dias
     if train:
         model5 = modelo
+
+        import time
+        t_start5 = time.time()
         model5.fit(
             df.drop(columns=get_drops(df, 5)).iloc[:-5], 
             df["Target5"].iloc[:-5]
         )
-        joblib.dump(model5, f"{head_path}models/modelo_5_{ticker}.joblib")
+        t_train5 = time.time() - t_start5
+
+        joblib.dump(model5, f"{head_path}/Models/modelo_5_{ticker}.joblib")
     else:
-        model5 = joblib.load(f"{head_path}models/modelo_5_{ticker}.joblib")
+        model5 = joblib.load(f"{head_path}/Models/modelo_5_{ticker}.joblib")
 
     p5 = model5.predict(df.tail(1).drop(columns=get_drops(df,5)))[0]
 
 
+    from model_tracking import model_tracking_insert
+    from sklearn.metrics import mean_absolute_error
+    from la_libreria.utils import get_ts
+
+    model_tracking_insert(
+        timestamp=get_ts(),
+        days="5",
+        nombre_modelo=model5.__class__.__name__,
+        t_training=t_train5,
+        n_train=df.shape[0],
+        parametros=model5.get_params(),
+        metrics={
+            "mae": mean_absolute_error(df["Target5"].iloc[:-5], model5.predict(df.drop(columns=get_drops(df,5)).iloc[:-5]))
+        },
+        last_date=df.index[-5],
+        first_date=df.index[0],
+    )
+    
     # prediccion 10 dias
     if train:
         model10 = modelo
+        t_start10 = time.time()
         model10.fit(
             df.drop(columns=get_drops(df, 10)).iloc[:-10], 
             df["Target10"].iloc[:-10]
         )
-        joblib.dump(model10, f"{head_path}models/modelo_10_{ticker}.joblib")
+        t_train10 = time.time() - t_start10
+        joblib.dump(model10, f"{head_path}/Models/modelo_10_{ticker}.joblib")
     else:
-        model10 = joblib.load(f"{head_path}models/modelo_10_{ticker}.joblib")
+        model10 = joblib.load(f"{head_path}/Models/modelo_10_{ticker}.joblib")
 
     p10 = model10.predict(df.tail(1).drop(columns=get_drops(df,10)))[0]
+
+    model_tracking_insert(
+        timestamp=get_ts(),
+        days="10",
+        nombre_modelo=model10.__class__.__name__,
+        t_training=t_train10,
+        n_train=df.shape[0],
+        parametros=model10.get_params(),
+        metrics={
+            "mae": mean_absolute_error(df["Target10"].iloc[:-10], model10.predict(df.drop(columns=get_drops(df,10)).iloc[:-10]))
+        },
+        last_date=df.index[-10],
+        first_date=df.index[0],
+    )
+
 
     # prediccion 30 dias
     if train:
         model30 = modelo
+        t_start30 = time.time()
         model30.fit(
             df.drop(columns=get_drops(df, 30)).iloc[:-30], 
             df["Target30"].iloc[:-30]
         )
-        joblib.dump(model30, f"{head_path}models/modelo_30_{ticker}.joblib")
+        t_train30 = time.time() - t_start30
+        joblib.dump(model30, f"{head_path}/Models/modelo_30_{ticker}.joblib")
     else:
-        model30 = joblib.load(f"{head_path}models/modelo_30_{ticker}.joblib")
+        model30 = joblib.load(f"{head_path}/Models/modelo_30_{ticker}.joblib")
 
     p30 = model30.predict(df.tail(1).drop(columns=get_drops(df,30)))[0]
+
+
+    model_tracking_insert(
+        timestamp=get_ts(),
+        days="30",
+        nombre_modelo=model30.__class__.__name__,
+        t_training=t_train30,
+        n_train=df.shape[0],
+        parametros=model30.get_params(),
+        metrics={
+            "mae": mean_absolute_error(df["Target30"].iloc[:-30], model30.predict(df.drop(columns=get_drops(df,30)).iloc[:-30]))
+        },
+        last_date=df.index[-30],
+        first_date=df.index[0],
+    )
+
+
 
     from guardar_prediccion import guardar_prediccion
     guardar_prediccion(
@@ -138,7 +197,6 @@ except:
 
 
 model = LinearRegression()
-
 
 predecir(
     host="estrie01-estimacionderiego1.j.aivencloud.com",
