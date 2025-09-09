@@ -97,12 +97,14 @@ def predecir(modelo,
     from sklearn.metrics import mean_absolute_error
     from la_libreria.utils import get_ts
 
+
     model_tracking_insert(
         timestamp=get_ts(),
         days="5",
         nombre_modelo=model5.__class__.__name__,
         t_training=t_train5,
         n_train=df.shape[0],
+        features=df.drop(columns=["Target5", "Target10", "Target30"]).columns.tolist(),
         parametros=model5.get_params(),
         metrics={
             "mae": mean_absolute_error(df["Target5"].iloc[:-5], model5.predict(df.drop(columns=get_drops(df,5)).iloc[:-5]))
@@ -132,6 +134,7 @@ def predecir(modelo,
         nombre_modelo=model10.__class__.__name__,
         t_training=t_train10,
         n_train=df.shape[0],
+        features=df.drop(columns=["Target5", "Target10", "Target30"]).columns.tolist(),
         parametros=model10.get_params(),
         metrics={
             "mae": mean_absolute_error(df["Target10"].iloc[:-10], model10.predict(df.drop(columns=get_drops(df,10)).iloc[:-10]))
@@ -163,6 +166,7 @@ def predecir(modelo,
         nombre_modelo=model30.__class__.__name__,
         t_training=t_train30,
         n_train=df.shape[0],
+        features=df.drop(columns=["Target5", "Target10", "Target30"]).columns.tolist(),
         parametros=model30.get_params(),
         metrics={
             "mae": mean_absolute_error(df["Target30"].iloc[:-30], model30.predict(df.drop(columns=get_drops(df,30)).iloc[:-30]))
