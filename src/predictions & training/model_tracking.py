@@ -4,17 +4,19 @@ from la_libreria.utils import get_ts
 
 
 def model_tracking_insert(timestamp,
-                          days,
-                          nombre_modelo,
-                          t_training,
-                          n_train,
-                          features,
-                          parametros,
-                          metrics,
-                          last_date,
-                          first_date,
-                          credentials=None,
-                          ticker="^GSPC"):
+        target,
+        nombre_modelo,
+        ts_training,
+        n_train,
+        n_test,
+        features,
+        parametros,
+        metrics,
+        last_date,
+        first_date,
+        ticker,
+        training_time,
+        prediction_time):
 
     import pandas as pd
 
@@ -29,37 +31,42 @@ def model_tracking_insert(timestamp,
     for metric_name, metric_value in metrics.items():
         rows.append({
             "Timestamp": timestamp,
-            "Days": days,
-            "Ticker": ticker,
+            "Target": target,
             "nombre_modelo": nombre_modelo,
-            "t_train": t_training,
+            "ts_training": ts_training,
             "n_train": n_train,
+            "n_test": n_test,
             "features": json.dumps(features),
             "parametros": json.dumps(parametros),
             "metric_name": metric_name,
             "metric_value": metric_value,
             "last_date": last_date,
-            "first_date": first_date
+            "first_date": first_date,
+            "Ticker": ticker,
+            "training_time": training_time,
+            "prediction_time": prediction_time
         })
 
     model_tracking_table = pd.DataFrame(rows)
-
+    print(model_tracking_table)
+    conn.get_data("select * from model_tracking1")
     try:
         conn.create_table(
             data=model_tracking_table,
-            table_name="model_tracking_table",
-            pks=["Timestamp", "Ticker", "Days", "metric_name"],
+            table_name="model_tracking1",
+            pks=["Timestamp","Target","ts_training","Ticker","nombre_modelo"],
             exceptions={}
         )
     except Exception:
+        print("La tabla ya existe")
         pass
-    
-    conn.get_data("select * from model_tracking")
 
     conn.insert_data(
         data=model_tracking_table,
-        table_name="model_tracking_table",
-        pks=["Timestamp", "Ticker", "Days", "metric_name"]
+        table_name="model_tracking1",
+        pks=["Timestamp","Target","ts_training","Ticker","nombre_modelo"]
     )
+
+    conn.get_data("select * from model_tracking1")
     
     conn.close()
