@@ -1,6 +1,6 @@
 WITH stock AS (
     SELECT Date, Ticker, Open, Close, High, Low, Volume
-    FROM stock_prices
+    FROM stock_data
     WHERE Date >= date_placeholder AND Ticker = ticker_placeholder
 ),
 targets AS (
@@ -78,4 +78,5 @@ LEFT JOIN fedfunds ON fedfunds.Date = src.Date
 LEFT JOIN dgs10 ON dgs10.Date = src.Date
 LEFT JOIN pce ON pce.Date = src.Date
 LEFT JOIN dff ON dff.Date = src.Date;
+
     
