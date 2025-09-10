@@ -96,24 +96,25 @@ def predecir(modelo,
     t_pred5 = time.time() - t_start_p5
     ts_training5 = get_ts()
 
-    model_tracking_insert(
-        timestamp=get_ts(),
-        target="5",
-        nombre_modelo=model5.__class__.__name__,
-        ts_training=ts_training5,
-        n_train=df.shape[0],
-        n_test=1,
-        features=df.drop(columns=["Target5", "Target10", "Target30"]).columns.tolist(),
-        parametros=model5.get_params(),
-        metrics={
-            "mae": None
-        },
-        last_date=df.index[-5],
-        first_date=df.index[0],
-        ticker=ticker,
-        training_time= t_train5,
-        prediction_time= t_pred5
-    )
+    if train:
+        model_tracking_insert(
+            timestamp=get_ts(),
+            target="5",
+            nombre_modelo=model5.__class__.__name__,
+            ts_training=ts_training5,
+            n_train=df.shape[0],
+            n_test=1,
+            features=df.drop(columns=["Target5", "Target10", "Target30"]).columns.tolist(),
+            parametros=model5.get_params(),
+            metrics={
+                "mae": None
+            },
+            last_date=df.index[-1],
+            first_date=df.index[0],
+            ticker=ticker,
+            training_time= t_train5,
+            prediction_time= t_pred5
+        )
     
     # prediccion 10 dias
     if train:
@@ -133,24 +134,25 @@ def predecir(modelo,
     t_pred10 = time.time() - t_start_p10
     ts_training10 = get_ts()
 
-    model_tracking_insert(
-        timestamp=get_ts(),
-        target="10",
-        nombre_modelo=model10.__class__.__name__,
-        ts_training=ts_training10,
-        n_train=df.shape[0],
-        n_test=1,
-        features=df.drop(columns=["Target5", "Target10", "Target30"]).columns.tolist(),
-        parametros=model10.get_params(),
-        metrics={
-            "mae": None
-        },
-        last_date=df.index[-10],
-        first_date=df.index[0],
-        ticker=ticker,
-        training_time= t_train10,
-        prediction_time= t_pred10
-    )
+    if train:
+        model_tracking_insert(
+            timestamp=get_ts(),
+            target="10",
+            nombre_modelo=model10.__class__.__name__,
+            ts_training=ts_training10,
+            n_train=df.shape[0],
+            n_test=1,
+            features=df.drop(columns=["Target5", "Target10", "Target30"]).columns.tolist(),
+            parametros=model10.get_params(),
+            metrics={
+                "mae": None
+            },
+            last_date=df.index[-1],
+            first_date=df.index[0],
+            ticker=ticker,
+            training_time= t_train10,
+            prediction_time= t_pred10
+        )
 
 
     # prediccion 30 dias
@@ -171,24 +173,25 @@ def predecir(modelo,
     t_pred30 = time.time() - t_start_p30
     ts_training30 = get_ts()
 
-    model_tracking_insert(
-        timestamp=get_ts(),
-        target="30",
-        nombre_modelo=model30.__class__.__name__,
-        ts_training=ts_training30,
-        n_train=df.shape[0],
-        n_test=1,
-        features=df.drop(columns=["Target5", "Target10", "Target30"]).columns.tolist(),
-        parametros=model30.get_params(),
-        metrics={
-            "mae": None
-        },
-        last_date=df.index[-30],
-        first_date=df.index[0],
-        ticker=ticker,
-        training_time= t_train30,
-        prediction_time= t_pred30
-    )
+    if train:
+        model_tracking_insert(
+            timestamp=get_ts(),
+            target="30",
+            nombre_modelo=model30.__class__.__name__,
+            ts_training=ts_training30,
+            n_train=df.shape[0],
+            n_test=1,
+            features=df.drop(columns=["Target5", "Target10", "Target30"]).columns.tolist(),
+            parametros=model30.get_params(),
+            metrics={
+                "mae": None
+            },
+            last_date=df.index[-1],
+            first_date=df.index[0],
+            ticker=ticker,
+            training_time= t_train30,
+            prediction_time= t_pred30
+        )
 
 
 

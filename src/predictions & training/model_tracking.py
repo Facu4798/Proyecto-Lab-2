@@ -54,7 +54,7 @@ def model_tracking_insert(timestamp,
         conn.create_table(
             data=model_tracking_table,
             table_name="model_tracking1",
-            pks=["Timestamp","Target","ts_training","Ticker","nombre_modelo"],
+            pks=["Timestamp"],
             exceptions={}
         )
     except Exception:
