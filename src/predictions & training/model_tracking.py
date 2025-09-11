@@ -6,7 +6,6 @@ from la_libreria.utils import get_ts
 def model_tracking_insert(timestamp,
         target,
         nombre_modelo,
-        ts_training,
         n_train,
         n_test,
         features,
@@ -33,7 +32,6 @@ def model_tracking_insert(timestamp,
             "Timestamp": timestamp,
             "Target": target,
             "nombre_modelo": nombre_modelo,
-            "ts_training": ts_training,
             "n_train": n_train,
             "n_test": n_test,
             "features": json.dumps(features),
@@ -48,14 +46,13 @@ def model_tracking_insert(timestamp,
         })
 
     model_tracking_table = pd.DataFrame(rows)
-    print(model_tracking_table)
-    conn.get_data("select * from model_tracking1")
+    
     try:
         conn.create_table(
             data=model_tracking_table,
-            table_name="model_tracking1",
+            table_name="model_tracking",
             pks=["Timestamp"],
-            exceptions={}
+            exceptions={"features":"TEXT", "parametros":"TEXT"}
         )
     except Exception:
         print("La tabla ya existe")
@@ -63,10 +60,8 @@ def model_tracking_insert(timestamp,
 
     conn.insert_data(
         data=model_tracking_table,
-        table_name="model_tracking1",
-        pks=["Timestamp","Target","ts_training","Ticker","nombre_modelo"]
+        table_name="model_tracking",
+        pks=["Timestamp"]
     )
-
-    conn.get_data("select * from model_tracking1")
     
     conn.close()
