@@ -1,6 +1,7 @@
 #set working directory to current file
 import os
 import sys
+from get_last_model import get_last_model
 
 # if linux, clear else cls
 if sys.platform.startswith('linux'):
@@ -89,7 +90,7 @@ def predecir(modelo,
         t_train5 = time.time() - t_start5
         joblib.dump(model5, f"{head_path}/Models/modelo_5_{ticker}_{get_ts()}.joblib")
     else:
-        model5 = joblib.load(f"{head_path}/Models/modelo_5_{ticker}.joblib")
+        model5 = joblib.load(f"{head_path}/Models/modelo_5_{ticker}_{get_last_model(ticker=ticker,target='5')}.joblib")
 
     t_start_p5 = time.time()
     p5 = model5.predict(df.tail(1).drop(columns=get_drops(df,5)))[0]
@@ -126,7 +127,7 @@ def predecir(modelo,
         t_train10 = time.time() - t_start10
         joblib.dump(model10, f"{head_path}/Models/modelo_10_{ticker}_{get_ts()}.joblib")
     else:
-        model10 = joblib.load(f"{head_path}/Models/modelo_10_{ticker}.joblib")
+        model10 = joblib.load(f"{head_path}/Models/modelo_10_{ticker}_{get_last_model(ticker=ticker,target='10')}.joblib")
 
     t_start_p10 = time.time()
     p10 = model10.predict(df.tail(1).drop(columns=get_drops(df,10)))[0]
@@ -162,7 +163,7 @@ def predecir(modelo,
         t_train30 = time.time() - t_start30
         joblib.dump(model30, f"{head_path}/Models/modelo_30_{ticker}_{get_ts()}.joblib")
     else:
-        model30 = joblib.load(f"{head_path}/Models/modelo_30_{ticker}.joblib")
+        model30 = joblib.load(f"{head_path}/Models/modelo_30_{ticker}_{get_last_model(ticker=ticker,target='30')}.joblib")
 
     t_start_p30 = time.time()
     p30 = model30.predict(df.tail(1).drop(columns=get_drops(df,30)))[0]
