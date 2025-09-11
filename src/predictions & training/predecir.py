@@ -94,14 +94,13 @@ def predecir(modelo,
     t_start_p5 = time.time()
     p5 = model5.predict(df.tail(1).drop(columns=get_drops(df,5)))[0]
     t_pred5 = time.time() - t_start_p5
-    ts_training5 = get_ts()
+
 
     if train:
         model_tracking_insert(
-            timestamp=get_ts(),
+            timestamp=t_start5,
             target="5",
             nombre_modelo=model5.__class__.__name__,
-            ts_training=ts_training5,
             n_train=df.shape[0],
             n_test=1,
             features=df.drop(columns=["Target5", "Target10", "Target30"]).columns.tolist(),
@@ -132,14 +131,12 @@ def predecir(modelo,
     t_start_p10 = time.time()
     p10 = model10.predict(df.tail(1).drop(columns=get_drops(df,10)))[0]
     t_pred10 = time.time() - t_start_p10
-    ts_training10 = get_ts()
 
     if train:
         model_tracking_insert(
-            timestamp=get_ts(),
+            timestamp=t_start10,
             target="10",
             nombre_modelo=model10.__class__.__name__,
-            ts_training=ts_training10,
             n_train=df.shape[0],
             n_test=1,
             features=df.drop(columns=["Target5", "Target10", "Target30"]).columns.tolist(),
@@ -153,7 +150,6 @@ def predecir(modelo,
             training_time= t_train10,
             prediction_time= t_pred10
         )
-
 
     # prediccion 30 dias
     if train:
@@ -171,14 +167,12 @@ def predecir(modelo,
     t_start_p30 = time.time()
     p30 = model30.predict(df.tail(1).drop(columns=get_drops(df,30)))[0]
     t_pred30 = time.time() - t_start_p30
-    ts_training30 = get_ts()
 
     if train:
         model_tracking_insert(
-            timestamp=get_ts(),
+            timestamp=t_start30,
             target="30",
             nombre_modelo=model30.__class__.__name__,
-            ts_training=ts_training30,
             n_train=df.shape[0],
             n_test=1,
             features=df.drop(columns=["Target5", "Target10", "Target30"]).columns.tolist(),
@@ -192,7 +186,6 @@ def predecir(modelo,
             training_time= t_train30,
             prediction_time= t_pred30
         )
-
 
 
     from guardar_prediccion import guardar_prediccion
@@ -220,12 +213,16 @@ except:
 
 model = LinearRegression()
 
+
+from la_libreria.authentication import Credentials
+creds = Credentials().load(path="Credentials/db_prod.json").dict
+
 predecir(
-    host="estrie01-estimacionderiego1.j.aivencloud.com",
-    user="avnadmin",
-    password="AVNS_vBt5bLw5TLinvY6G_Eo",
-    port=24195,
-    database="defaultdb",
+    host=creds["host"],
+    user=creds["user"],
+    password=creds["password"],
+    port=creds["port"],
+    database=creds["database"],
     modelo=model,
     ticker="^GSPC",
     train=True
