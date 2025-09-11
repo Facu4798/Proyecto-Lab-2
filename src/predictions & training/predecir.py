@@ -87,7 +87,7 @@ def predecir(modelo,
             df["Target5"].iloc[:-5]
         )
         t_train5 = time.time() - t_start5
-        joblib.dump(model5, f"{head_path}/Models/modelo_5_{ticker}.joblib")
+        joblib.dump(model5, f"{head_path}/Models/modelo_5_{ticker}_{get_ts()}.joblib")
     else:
         model5 = joblib.load(f"{head_path}/Models/modelo_5_{ticker}.joblib")
 
@@ -124,7 +124,7 @@ def predecir(modelo,
             df["Target10"].iloc[:-10]
         )
         t_train10 = time.time() - t_start10
-        joblib.dump(model10, f"{head_path}/Models/modelo_10_{ticker}.joblib")
+        joblib.dump(model10, f"{head_path}/Models/modelo_10_{ticker}_{get_ts()}.joblib")
     else:
         model10 = joblib.load(f"{head_path}/Models/modelo_10_{ticker}.joblib")
 
@@ -160,7 +160,7 @@ def predecir(modelo,
             df["Target30"].iloc[:-30]
         )
         t_train30 = time.time() - t_start30
-        joblib.dump(model30, f"{head_path}/Models/modelo_30_{ticker}.joblib")
+        joblib.dump(model30, f"{head_path}/Models/modelo_30_{ticker}_{get_ts()}.joblib")
     else:
         model30 = joblib.load(f"{head_path}/Models/modelo_30_{ticker}.joblib")
 
