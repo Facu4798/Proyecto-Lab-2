@@ -73,46 +73,120 @@ def predecir(modelo,
                 drops.append(col)
         return drops
     
+    import time
+    from model_tracking import model_tracking_insert
+    from sklearn.metrics import mean_absolute_error
+    from la_libreria.utils import get_ts
 
     # prediccion 5 dias
     if train:
         model5 = modelo
+        t_start5 = time.time()
         model5.fit(
             df.drop(columns=get_drops(df, 5)).iloc[:-5], 
             df["Target5"].iloc[:-5]
         )
-        joblib.dump(model5, f"{head_path}models/modelo_5_{ticker}.joblib")
+        t_train5 = time.time() - t_start5
+        joblib.dump(model5, f"{head_path}/Models/modelo_5_{ticker}.joblib")
     else:
-        model5 = joblib.load(f"{head_path}models/modelo_5_{ticker}.joblib")
+        model5 = joblib.load(f"{head_path}/Models/modelo_5_{ticker}.joblib")
 
+    t_start_p5 = time.time()
     p5 = model5.predict(df.tail(1).drop(columns=get_drops(df,5)))[0]
+    t_pred5 = time.time() - t_start_p5
 
 
+    if train:
+        model_tracking_insert(
+            timestamp=t_start5,
+            target="5",
+            nombre_modelo=model5.__class__.__name__,
+            n_train=df.shape[0],
+            n_test=1,
+            features=df.drop(columns=["Target5", "Target10", "Target30"]).columns.tolist(),
+            parametros=model5.get_params(),
+            metrics={
+                "mae": None
+            },
+            last_date=df.index[-1],
+            first_date=df.index[0],
+            ticker=ticker,
+            training_time= t_train5,
+            prediction_time= t_pred5
+        )
+    
     # prediccion 10 dias
     if train:
         model10 = modelo
+        t_start10 = time.time()
         model10.fit(
             df.drop(columns=get_drops(df, 10)).iloc[:-10], 
             df["Target10"].iloc[:-10]
         )
-        joblib.dump(model10, f"{head_path}models/modelo_10_{ticker}.joblib")
+        t_train10 = time.time() - t_start10
+        joblib.dump(model10, f"{head_path}/Models/modelo_10_{ticker}.joblib")
     else:
-        model10 = joblib.load(f"{head_path}models/modelo_10_{ticker}.joblib")
+        model10 = joblib.load(f"{head_path}/Models/modelo_10_{ticker}.joblib")
 
+    t_start_p10 = time.time()
     p10 = model10.predict(df.tail(1).drop(columns=get_drops(df,10)))[0]
+    t_pred10 = time.time() - t_start_p10
+
+    if train:
+        model_tracking_insert(
+            timestamp=t_start10,
+            target="10",
+            nombre_modelo=model10.__class__.__name__,
+            n_train=df.shape[0],
+            n_test=1,
+            features=df.drop(columns=["Target5", "Target10", "Target30"]).columns.tolist(),
+            parametros=model10.get_params(),
+            metrics={
+                "mae": None
+            },
+            last_date=df.index[-1],
+            first_date=df.index[0],
+            ticker=ticker,
+            training_time= t_train10,
+            prediction_time= t_pred10
+        )
 
     # prediccion 30 dias
     if train:
         model30 = modelo
+        t_start30 = time.time()
         model30.fit(
             df.drop(columns=get_drops(df, 30)).iloc[:-30], 
             df["Target30"].iloc[:-30]
         )
-        joblib.dump(model30, f"{head_path}models/modelo_30_{ticker}.joblib")
+        t_train30 = time.time() - t_start30
+        joblib.dump(model30, f"{head_path}/Models/modelo_30_{ticker}.joblib")
     else:
-        model30 = joblib.load(f"{head_path}models/modelo_30_{ticker}.joblib")
+        model30 = joblib.load(f"{head_path}/Models/modelo_30_{ticker}.joblib")
 
+    t_start_p30 = time.time()
     p30 = model30.predict(df.tail(1).drop(columns=get_drops(df,30)))[0]
+    t_pred30 = time.time() - t_start_p30
+
+    if train:
+        model_tracking_insert(
+            timestamp=t_start30,
+            target="30",
+            nombre_modelo=model30.__class__.__name__,
+            n_train=df.shape[0],
+            n_test=1,
+            features=df.drop(columns=["Target5", "Target10", "Target30"]).columns.tolist(),
+            parametros=model30.get_params(),
+            metrics={
+                "mae": None
+            },
+            last_date=df.index[-1],
+            first_date=df.index[0],
+            ticker=ticker,
+            training_time= t_train30,
+            prediction_time= t_pred30
+        )
+
 
     from guardar_prediccion import guardar_prediccion
     guardar_prediccion(
@@ -140,12 +214,15 @@ except:
 model = LinearRegression()
 
 
+from la_libreria.authentication import Credentials
+creds = Credentials().load(path="Credentials/db_prod.json").dict
+
 predecir(
-    host="estrie01-estimacionderiego1.j.aivencloud.com",
-    user="avnadmin",
-    password="AVNS_vBt5bLw5TLinvY6G_Eo",
-    port=24195,
-    database="defaultdb",
+    host=creds["host"],
+    user=creds["user"],
+    password=creds["password"],
+    port=creds["port"],
+    database=creds["database"],
     modelo=model,
     ticker="^GSPC",
     train=True
