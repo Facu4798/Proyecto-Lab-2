@@ -1,15 +1,29 @@
+def cargar_datos_yahoo(data,
+                 user = 'root',
+                 password = 'password',
+                 port=3306, 
+                 host='localhost',
+                 ticker='TSLA',
+                 database='defaultdb'):
+    """
+    Esta función carga los datos de yahoo a la base de datos MySQL 
+    **Parámetros:**
+    - **data:** DataFrame, datos a cargar en la base de datos
+    - **user:** str, usuario de MySQL (default='root')
+    - **password:** str, contraseña de MySQL (default='password')
+    - **port:** int, puerto de MySQL (default=3306)
+    - **host:** str, host de MySQL (default='localhost')
+    - **ticker:** str, ticker de la acción (default='TSLA')
+    """
+    try:
+        import mysql.connector
+        from mysql.connector import Error
+    except:
+        import os
+        os.system('pip install mysql-connector-python')
+        import mysql.connector
+        from mysql.connector import Error
 
-
-from la_libreria.authentication import Credentials
-from la_libreria.connectors import MySQLConnector
-from la_libreria.utils import get_ts
-
-def cargar_datos_yahoo(inicio=None, fin=None, ticker='TSLA',credentials=None):
-    import io
-    import requests
-    import ftplib
-
-    #importar pandas
     try:
         import pandas as pd
     except:
@@ -17,56 +31,53 @@ def cargar_datos_yahoo(inicio=None, fin=None, ticker='TSLA',credentials=None):
         os.system('pip install pandas')
         import pandas as pd
 
-    #validacion de fecha
-    if inicio is None or fin is None:
-        pass
-    elif not isinstance(inicio, str) or not isinstance(fin, str):
-        raise ValueError("Las fechas deben ser cadenas en formato 'YYYY-MM-DD'")
-    elif inicio >= fin:
-        raise ValueError("La fecha de inicio debe ser menor que la fecha de fin")
-    
-    etl_ts = get_ts()
-
-
-
-    #ingestar los datos de yahoo finance
-    from ingesta_yahoo import obtener_datos_yahoo
-    data_yahoo = obtener_datos_yahoo(
-        ticker=ticker,
-        start=inicio,
-        end=fin,
-    )
-    data_yahoo["Ticker"]=ticker
-    data_yahoo = data_yahoo.reset_index()
-    data_yahoo = data_yahoo.rename(columns={"index":"Date"})
-    data_yahoo = data_yahoo[["Date","Ticker","Open","High","Low","Close","Volume"]]
-    data_yahoo["etl_ts"] = etl_ts
-
-    conn = MySQLConnector(credentials.dict)
-    conn.test_connection()
-    conn.connect()
-
-    try:
-        conn.create_table(
-            data=data_yahoo,
-            table_name="stock_data",
-            pks=["Date","Ticker"],
-            exceptions={"Volume":"BIGINT"}
-        )
-    except:
-        pass
-
-    conn.insert_data(
-        data=data_yahoo,
-        table_name="stock_data",
-        pks=["Date","Ticker"]
-    )
-    
-    last_date = data_yahoo["Date"].max().strftime('%Y-%m-%d')
-    conn.insert_data(
-        pd.DataFrame({"date":[last_date],"description":[f"sor_to_rdz {ticker}"]}),
-        table_name="cdc",
-        pks=["description"]
+    connection = mysql.connector.connect(
+        host=host,
+        user=user,
+        password=password,
+        port=port,
+        database=database
     )
 
-    conn.close()
+
+    if connection.is_connected():
+            cursor = connection.cursor()
+            cursor.execute(f"USE {database}")
+
+            # Verificar si la tabla existe, si no, crearla
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS stock_data (
+                    Date DATE NOT NULL,
+                    Ticker VARCHAR(10) NOT NULL,
+                    Open FLOAT,
+                    High FLOAT,
+                    Low FLOAT,
+                    Close FLOAT,
+                    Volume BIGINT,
+                    PRIMARY KEY (Date, Ticker));
+                    """)
+            
+            sql_insert = """
+                INSERT INTO stock_data (Date, Close , High, Low, Open, Volume,Ticker)
+                VALUES (%s, %s, %s, %s, %s, %s, %s)
+                ON DUPLICATE KEY UPDATE Open=VALUES(Open), High=VALUES(High), Low=VALUES(Low), Close=VALUES(Close), Volume=VALUES(Volume)
+            """
+
+            data["Ticker"] = ticker
+            data = [
+                        tuple(None if pd.isna(value) else value for value in row)
+                        for row in data.itertuples(index=True, name=None)
+                    ]
+            connection.autocommit=True
+            cursor.executemany(sql_insert, data)
+            connection.commit()
+    if connection.is_connected():
+        # cerrar cursor y conexión
+        try:
+            cursor.close()
+        except:
+            pass
+        try:
+            connection.close()
+        except:
+            pass

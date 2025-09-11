@@ -21,7 +21,11 @@ Una vez los datos están almacenados, se realiza un proceso de unión entre amba
 En esta tabla se devuelven todas las columnas de ambas tablas unidas, ademas de las variables objetivo que son `Target5`, `Target10` y `Target30`. 
 
 ## Feature engineering
-Sobre la tabla curated, se aplican transformaciones adicionales para enriquecer el conjunto de datos (feature engineering). 
+Sobre la tabla curated, se aplican transformaciones adicionales para enriquecer el conjunto de datos (feature engineering). Estas transformaciones son las siguientes:
+
+- trans 1
+- trans 2
+- trans 3
 
 Algunas de estas transformaciones fueron desarrolladas por el equipo. Estas se encuentran en `src/predictions_&_training/`.
 
@@ -37,15 +41,20 @@ Finalmente, la aplicación web consulta la base de datos y presenta al usuario f
 
 Este front-end permite visualizar y consultar resultados. La aplicación se encuentra actualmente hosteada en [render.com](https://estimacion-riesgo-sp500.onrender.com/)
 
-# Cambios propuestos
+## AWS
 
-## 1. Incorporar un Feature store luego del pipeline
+A continuación se presenta una arquitectura recomendada para desplegar el proyecto en AWS:
 
-Objetivo: Incluir un feature store luego del pipeline de feature engineering para almacenar las features.
+<p align="center">
+    <img src="image-1.png" alt="aws_architecture">
+</p> 
 
-Beneficios:
-- Reduce la cantidad de computo necesario ya que se almacenan las features historicas
-- Evita el recomputo de los features macroeconómicos para diferentes acciones
+Para la ingesta y transformación inicial de los datos, se recomienda utilizar AWS Glue, con un trigger diario que se encargue de ejecutar el proceso de ingesta a las 20:00 PM ECT. 
 
-Desventajas:
-- Generan mas espacio de almacenamiento.
+Los resultados de la ingesta y transformación inicial se almacenarán en una base de datos MySQL en Amazon RDS.
+
+Para la etapa de feature engineering, se recomienda utilizar un processing job de AWS SageMaker, que se ejecutará diariamente a las 21:00 PM ECT. 
+
+Finalmente, el modelo de predicción se entrenará y se desplegará utilizando AWS SageMaker, y las predicciones se almacenarán en una base de datos MySQL en Amazon RDS.
+
+Estas predicciones serán consultadas mediante un módulo de la aplicación web, que se encuentra desplegada en AWS Elastic Beanstalk.
