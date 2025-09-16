@@ -4,7 +4,7 @@ import pandas as pd
 from la_libreria.utils import substract_date,get_ts
 from la_libreria.authentication import Credentials
 from la_libreria.connectors import MySQLConnector
-from cdc import get_cdc_date
+from cdc_l2 import get_cdc_date
 os.system("clear")
 
 # leer las credenciales de la base de datos
@@ -18,13 +18,13 @@ except:
 # parametros de la corrida
 shift = 35
 cdc_date = get_cdc_date("rdz_to_cdz",creds=creds)
-print(cdc_date)
+
+
 if cdc_date is not None:
     cdc_date = substract_date(date_str=str(cdc_date),
                               amount=shift,
-                              iterval="d")
+                              interval="d")
 ticker="^GSPC"
-
 
 
 
@@ -48,7 +48,7 @@ try:
     conn.connect()
     data = conn.get_data(query=q)
     data["etl_ts"] = str(get_ts())
-    print(len(data))
+    print(data)
     conn.close()
 except Exception as e:
     sys.exit(e)

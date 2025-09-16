@@ -25,7 +25,7 @@ targets AS (
                THEN MIN(Close) OVER (ORDER BY date ASC ROWS BETWEEN 1 FOLLOWING AND UNBOUNDED FOLLOWING)
                ELSE MIN(Close) OVER (ORDER BY date ASC ROWS BETWEEN 1 FOLLOWING AND 30 FOLLOWING)
            END AS MinCloseOver30Days
-    FROM target_filter where Date >= 'date_placeholder' and Ticker = 'ticker_placeholder'
+    FROM target_filter where Date >= 'date_placeholder'
 ),
 cpiaucsl AS (
     SELECT Date, Value AS CPI
