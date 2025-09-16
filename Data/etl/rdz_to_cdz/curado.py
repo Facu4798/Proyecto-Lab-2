@@ -10,6 +10,7 @@ os.system("clear")
 # parametros de la corrida
 shift = 35
 cdc_date = get_cdc_date("rdz_to_cdz")
+print(cdc_date)
 if cdc_date is not None:
     cdc_date = substract_date(date_str=str(cdc_date),
                               amount=shift,
@@ -25,7 +26,7 @@ except:
 
 # leer el archivo de la query
 try:
-    q = open("/workspaces/Proyecto-Lab-2/Data/etl/rdz_to_cdz/union copy.sql","r").readlines()
+    q = open("/workspaces/Proyecto-Lab-2/Data/etl/rdz_to_cdz/union copy 2.sql","r").readlines()
     q = "".join([l.replace("\n"," ") for l in q ])
     if cdc_date is None:
         q = q.replace("Date >= 'date_placeholder'","1=1")
@@ -43,6 +44,7 @@ try:
     conn.connect()
     data = conn.get_data(query=q)
     data["etl_ts"] = str(get_ts())
+    print(len(data))
     conn.close()
 except Exception as e:
     sys.exit(e)
@@ -52,7 +54,7 @@ except Exception as e:
 try:
     conn = MySQLConnector(creds.dict)
     conn.connect()
-    conn.create_table(data=data,table_name="curated",pks=["Date","Ticker"])
+    conn.create_table(data=data,table_name="curated",pks=["Date","Ticker"],exceptions={"Volume":"BIGINT"})
     conn.close()
 except Exception as e:
     print(e)

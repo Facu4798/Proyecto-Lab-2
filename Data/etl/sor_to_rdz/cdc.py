@@ -10,4 +10,3 @@ def get_cdc_date(desc):
         return conn.get_data(query=f"SELECT date FROM cdc WHERE description = '{desc}'").head(1).iloc[0,0]
     except:
         return None
-        

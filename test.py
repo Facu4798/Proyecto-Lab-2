@@ -5,7 +5,7 @@ os.system("clear")
 creds = Credentials().load(path="Credentials/db_dev.json")
 conn = MySQLConnector(creds.dict)
 conn.connect()
-print(conn.get_data(query="truncate table cdc"))
+print(conn.get_data(query="select * from cdc"))
 conn.close()
 
 # import pandas as pd
