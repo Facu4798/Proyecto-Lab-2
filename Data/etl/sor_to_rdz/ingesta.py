@@ -5,7 +5,7 @@ import os
 os.system("clear")
 
 try:
-    creds = Credentials().load(path="Credentials/db_prod.json")
+    creds = Credentials().load(path="Credentials/db_dev.json")
 except:
     raise Exception("No se pudo cargar las credenciales")
 
