@@ -1,9 +1,8 @@
 
-def get_cdc_date(desc):
+def get_cdc_date(desc,creds=None):
     from la_libreria.authentication import Credentials
     from la_libreria.connectors import MySQLConnector
 
-    creds = Credentials().load(path="/workspaces/Proyecto-Lab-2/Credentials/db_dev.json")
     conn = MySQLConnector(creds.dict)
     conn.connect()
     try:

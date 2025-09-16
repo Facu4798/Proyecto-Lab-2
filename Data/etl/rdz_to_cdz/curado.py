@@ -7,9 +7,17 @@ from la_libreria.connectors import MySQLConnector
 from cdc import get_cdc_date
 os.system("clear")
 
+# leer las credenciales de la base de datos
+try:
+    creds = Credentials().load(path="/workspaces/Proyecto-Lab-2/Credentials/db_dev.json")
+except: 
+    sys.exit("Credentials file not found")
+
+
+
 # parametros de la corrida
 shift = 35
-cdc_date = get_cdc_date("rdz_to_cdz")
+cdc_date = get_cdc_date("rdz_to_cdz",creds=creds)
 print(cdc_date)
 if cdc_date is not None:
     cdc_date = substract_date(date_str=str(cdc_date),
@@ -17,11 +25,7 @@ if cdc_date is not None:
                               iterval="d")
 ticker="^GSPC"
 
-# leer las credenciales de la base de datos
-try:
-    creds = Credentials().load(path="/workspaces/Proyecto-Lab-2/Credentials/db_dev.json")
-except: 
-    sys.exit("Credentials file not found")
+
 
 
 # leer el archivo de la query
