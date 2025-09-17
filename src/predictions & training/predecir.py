@@ -202,21 +202,8 @@ def predecir(modelo,
         database=database
     )
 
-    from monitoreo import monitor_table
-    monitor_table(date= df.index[-1],
-                                    ticker=ticker,
-                                    p5=p5,
-                                    p10=p10,
-                                    p30=p30)
-
-
-    from monitoreo import cargar_data_real
-    cargar_data_real(r5 = df['Target5'].iloc[-6],
-                                       date5 = df.index[-6],
-                                       r10 = df['Target10'].iloc[-11],
-                                       date10 = df.index[-11],
-                                       r30 = df['Target30'].iloc[-31],
-                                       date30 = df.index[-31])
+    from monitoring import metric_monitoring
+    metric_monitoring()
 
 try:
     from sklearn.linear_model import LinearRegression
