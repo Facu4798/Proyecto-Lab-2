@@ -9,13 +9,7 @@ def cargar_datos_yahoo(inicio=None, fin=None, ticker='TSLA',credentials=None):
     import requests
     import ftplib
 
-    #importar pandas
-    try:
-        import pandas as pd
-    except:
-        import os
-        os.system('pip install pandas')
-        import pandas as pd
+    import pandas as pd
 
     #validacion de fecha
     if inicio is None or fin is None:
@@ -26,7 +20,6 @@ def cargar_datos_yahoo(inicio=None, fin=None, ticker='TSLA',credentials=None):
         raise ValueError("La fecha de inicio debe ser menor que la fecha de fin")
     
     etl_ts = get_ts()
-
 
 
     #ingestar los datos de yahoo finance

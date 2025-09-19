@@ -1,7 +1,7 @@
 import sys
 import os
 import pandas as pd
-from la_libreria.utils import substract_date,get_ts
+from la_libreria.utils import substract_date,get_ts, parse_query
 from la_libreria.authentication import Credentials
 from la_libreria.connectors import MySQLConnector
 from cdc_l2 import get_cdc_date
@@ -30,17 +30,14 @@ ticker="^GSPC"
 
 # leer el archivo de la query
 try:
-    q = open("/workspaces/Proyecto-Lab-2/Data/etl/rdz_to_cdz/union copy 2.sql","r").readlines()
-    q = "".join([l.replace("\n"," ") for l in q ])
-    if cdc_date is None:
-        q = q.replace("Date >= 'date_placeholder'","1=1")
-    else:
-        q = q.replace("date_placeholder",str(cdc_date))
-    q = q.replace("ticker_placeholder", ticker)
-    q = q.replace(";","")
+    q = os.path.join(os.path.dirname(__file__),"union copy 2.sql")
+    q = parse_query(filepath=q, replacement_dict={
+        "date_placeholder": str(cdc_date) if cdc_date is not None else "1=1",
+        "ticker_placeholder": ticker
+    })
     
-except:
-    sys.exit("query file not found")
+except Exception as e:
+    sys.exit(e)
 
 # obtener los datos de rdz
 try:
@@ -48,7 +45,6 @@ try:
     conn.connect()
     data = conn.get_data(query=q)
     data["etl_ts"] = str(get_ts())
-    print(data)
     conn.close()
 except Exception as e:
     sys.exit(e)
