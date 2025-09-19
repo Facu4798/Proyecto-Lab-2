@@ -9,4 +9,4 @@ feature-engine
 seaborn
 fredapi
 yfinance
-git+https://github.com/Facu4798/the_etl_library.git
+git+https://github.com/Facu4798/the_etl_library.git --upgrade

@@ -8,14 +8,7 @@ def cargar_datos_fred(inicio=None, fin=None, credentials=None):
     import io
     import requests
     import ftplib
-
-    #importar pandas
-    try:
-        import pandas as pd
-    except:
-        import os
-        os.system('pip install pandas')
-        import pandas as pd
+    import pandas as pd
 
     #validacion de fecha
     if inicio is None or fin is None:

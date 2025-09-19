@@ -7,3 +7,5 @@ for r in requirements:
     r = r.strip()
     if r and not r.startswith('#'):
         os.system(f'pip install {r}')
+
+os.system("clear")
