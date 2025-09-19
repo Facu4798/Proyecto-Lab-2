@@ -20,4 +20,4 @@ SELECT  src.Date,
         Target5,
         Target30
 FROM curated as src
-WHERE src.Date >= date_placeholder;
+WHERE src.Date >= date_placeholder

@@ -21,4 +21,4 @@ SELECT  src.Date,
         Target30
 FROM curated as src
 ORDER BY src.Date DESC
-LIMIT 400;
+LIMIT limit_placeholder

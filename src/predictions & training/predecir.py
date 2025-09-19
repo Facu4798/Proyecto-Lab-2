@@ -1,17 +1,63 @@
 #set working directory to current file
 import os
 import sys
+from la_libreria.authentication import Credentials
+from la_libreria.connectors import MySQLConnector
+from la_libreria.utils import parse_query
+import joblib
+import pandas as pd
+os.system("clear")
 
-# if linux, clear else cls
-if sys.platform.startswith('linux'):
-    os.system('clear')
-else:
-    os.system('cls')
 
 predictions_path = os.path.dirname(os.path.abspath(__file__))
 src_path = os.path.dirname(predictions_path)
 head_path = os.path.dirname(src_path)
 print(f"src_path: {head_path}")
+
+
+train=True
+
+
+if train:
+    query_path = f"{predictions_path}/get_all.sql"
+    q =parse_query(filepath=query_path,replacement_dict={"date_placeholder":"1995-01-01"})
+else:
+    query_path = f"{predictions_path}/get_last.sql"
+    q =parse_query(filepath=query_path,replacement_dict={"limit_placeholder":"400"})
+
+
+creds = Credentials.load(path="/workspaces/Proyecto-Lab-2/Credentials/db_dev.json")
+
+
+conn = MySQLConnector(creds.dict)
+conn.connect()
+data = conn.get_data(q)
+
+from transformar_datos import transformar_datos
+df,columns_to_drop = transformar_datos(df)
+df = df.drop(columns=["Ticker"])
+
+
+def predecir(modelo,conn,train=True,data,targetcol):
+    data
+
+    if train:
+        modelo.fit(data.drop(columns=[i for i in data.columns if i.startswith("Target")]),
+                   data[targetcol])
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -26,26 +72,11 @@ def predecir(modelo,
              train=True):
     
 
-
-    import os
-    os.system("cls")
-
     #import pandas
-    try:
-        import pandas as pd
-    except ImportError:
-        import os
-        os.system('pip install pandas')
-        import pandas as pd
+    import pandas as pd
 
     #import joblib
-    try:
-        import joblib
-    except ImportError:
-        import os
-        os.system('pip install joblib')
-        import joblib
-
+    import joblib
 
     from obtener_datos import obtener_datos
     from obtener_query import obtener_query
@@ -55,12 +86,13 @@ def predecir(modelo,
     else:
         query_path = f"{predictions_path}/get_last.sql"
     
-    df = obtener_datos(obtener_query(file_path=query_path,start_date="1995-01-01"),
-                       user=user,
-                       host=host,
-                       password=password,
-                       port=port,
-                       database=database)
+    # df = obtener_datos(obtener_query(file_path=query_path,start_date="1995-01-01"),
+    #                    user=user,
+    #                    host=host,
+    #                    password=password,
+    #                    port=port,
+    #                    database=database)
+    q =parse_query()
     
     from transformar_datos import transformar_datos
     df,columns_to_drop = transformar_datos(df)
