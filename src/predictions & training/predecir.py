@@ -20,7 +20,7 @@ from sklearn.linear_model import LinearRegression
 M=LinearRegression()
 
 
-creds = Credentials.load(path="/workspaces/Proyecto-Lab-2/Credentials/db_dev.json")
+creds = Credentials().load(path="/workspaces/Proyecto-Lab-2/Credentials/db_dev.json")
 conn = MySQLConnector(creds.dict)
 conn.connect()
 
@@ -29,10 +29,12 @@ queries ={}
 for t in tickers:
     for d in days:
         if train:
-            q = parse_query(f"{query_path}/get_all_{t}_{t}.sql")
+            q = parse_query(f"{query_path}/get_all_{d}_{t}.sql",
+                            replacement_dict={"Date >= date_placeholder": "1995-01-01"})
             queries[f"{t}_{d}"] = q
         else:
-            q = parse_query(f"{query_path}/get_last_{t}_{t}.sql")
+            q = parse_query(f"{query_path}/get_last_{d}_{t}.sql",
+                            replacement_dict={"limit_placeholder":"400"})
             queries[f"{t}_{d}"] = q
 
 

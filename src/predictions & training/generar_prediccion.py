@@ -1,9 +1,13 @@
 import joblib
 import datetime
 from get_last_model import get_last_model
+from transformar_datos import transformar_datos
 
 def generar_prediccion(modelo,models_dir,train,days,ticker,data):
 
+    data,ctd = transformar_datos(data)
+
+    data = data.drop(columns=ctd)
 
     if train:
         x = data.drop(columns=[i for i in data.columns if i.startswith("Target")])
