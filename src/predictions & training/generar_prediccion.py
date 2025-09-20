@@ -1,26 +1,22 @@
+import joblib
+import datetime
+from get_last_model import get_last_model
 
-def generar_prediccion(ticker,
-                        dias,
-                        database,
-                        host,
-                        user,
-                        password,
-                        port,
-                        model_obj):
-    
-    from obtener_ultima_fila import obtener_ultima_fila
-    data = obtener_ultima_fila(database, host, user, password, port, ticker)
-    
-    if data.empty:
-        print("No hay datos para generar la predicción.")
-        return None
-    
-    drops = [col for col in data.columns if col.startswith("Target")]
-    # Preprocesar los datos si es necesario
-    data = data.drop(columns=drops)
-    
-    # Realizar la predicción
-    prediccion = model_obj.predict(data)
-    
-    return prediccion[0]  # Retornar el valor de la predicción
+def generar_prediccion(modelo,models_dir,train,days,ticker,data):
 
+
+    if train:
+        x = data.drop(columns=[i for i in data.columns if i.startswith("Target")])
+        x = x.iloc[:-days,:]
+        y = data[f"Target{days}"]
+        y = y.iloc[:-days]
+
+        modelo.fit(x,y)
+
+        now = datetime.datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
+        joblib.dump(modelo,f"{models_dir}modelo_{days}_{ticker}_{now}.joblib")
+    else:
+        modelo = get_last_model(ticker,days)
+
+    pred = modelo.predict(x.iloc[-1,:])[0]
+    return [x.iloc[-1,:]["Date"], pred]
