@@ -5,6 +5,7 @@ gunicorn
 scikit-learn
 matplotlib
 numpy
+arch
 feature-engine
 seaborn
 fredapi
