@@ -14,17 +14,17 @@ targets AS (
                WHEN COUNT(*) OVER (ORDER BY date ASC ROWS BETWEEN 1 FOLLOWING AND 10 FOLLOWING) < 10
                THEN MIN(Close) OVER (ORDER BY date ASC ROWS BETWEEN 1 FOLLOWING AND UNBOUNDED FOLLOWING)
                ELSE MIN(Close) OVER (ORDER BY date ASC ROWS BETWEEN 1 FOLLOWING AND 10 FOLLOWING)
-           END AS MinCloseOver10Days,
+           END AS min10,
            CASE
                WHEN COUNT(*) OVER(ORDER BY date ASC ROWS BETWEEN 1 FOLLOWING AND 5 FOLLOWING) < 5
                THEN MIN(Close) OVER (ORDER BY date ASC ROWS BETWEEN 1 FOLLOWING AND UNBOUNDED FOLLOWING)
                ELSE MIN(Close) OVER (ORDER BY date ASC ROWS BETWEEN 1 FOLLOWING AND 5 FOLLOWING)
-           END AS MinCloseOver5Days,
+           END AS min5,
            CASE
                WHEN COUNT(*) OVER(ORDER BY date ASC ROWS BETWEEN 1 FOLLOWING AND 30 FOLLOWING) < 30
                THEN MIN(Close) OVER (ORDER BY date ASC ROWS BETWEEN 1 FOLLOWING AND UNBOUNDED FOLLOWING)
                ELSE MIN(Close) OVER (ORDER BY date ASC ROWS BETWEEN 1 FOLLOWING AND 30 FOLLOWING)
-           END AS MinCloseOver30Days
+           END AS min30
     FROM target_filter where Date >= 'date_placeholder'
 ),
 cpiaucsl AS (
@@ -71,9 +71,9 @@ SELECT
     dgs10.Ten_year_treasury as 10_year_treasury,
     pce.PCE as PCE,
     dff.DFF as DFF,
-    targets.MinCloseOver10Days as Target5,
-    targets.MinCloseOver5Days as Target10,
-    targets.MinCloseOver30Days as Target30
+    (targets.min5-src.Close)/src.Close as Target5,
+    (targets.min10-src.Close)/src.Close as Target10,
+    (targets.min30-src.Close)/src.Close as Target30
 FROM stock AS src
 LEFT JOIN targets ON targets.Date = src.Date
 LEFT JOIN cpiaucsl ON cpiaucsl.Date = src.Date

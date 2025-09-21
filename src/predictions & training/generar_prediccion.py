@@ -53,7 +53,7 @@ def generar_prediccion(modelo,models_dir,train,days,ticker,data):
                         last_date=last_date,
                         training_time=tt,
                         prediction_time=pt,
-                        parametros=None,
+                        parametros=modelo.get_params(),
                         features=",".join(x.columns),
                         metrics={"MAE":None})
 

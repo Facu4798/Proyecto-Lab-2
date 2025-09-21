@@ -49,7 +49,6 @@ def cargar_datos_fred(inicio=None, fin=None, credentials=None):
     except:
         pass
     
-    print(data_fred)
     conn.insert_data(
         data = data_fred,
         table_name="macro_data",

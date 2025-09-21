@@ -45,6 +45,7 @@ class model_template:
     
     def predict(self, steps=5, exog_future=None):
         import pandas as pd
+        import numpy as np
         """Genera predicciones de volatilidad (sigma)."""
         if self.exog_cols is not None and exog_future is not None:
             # Caso REGARMA con múltiples exógenas
@@ -57,13 +58,14 @@ class model_template:
                 x_new = exog_future
             fc = self.res.forecast(horizon=steps, x=x_new, reindex=False)
 
-            return fc.variance.values[-1,:]
+
+            return np.sqrt(fc.variance.values[-1,:])
         
         
         else:
             # Caso sin exógenas
             fc = self.res.forecast(horizon=steps, reindex=False)
-            return fc.variance.values[-1,:]
+            return np.sqrt(fc.variance.values[-1,:])
     
     def get_params(self):
         params = {

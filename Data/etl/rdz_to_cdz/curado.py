@@ -30,11 +30,13 @@ ticker="^GSPC"
 
 # leer el archivo de la query
 try:
-    q = os.path.join(os.path.dirname(__file__),"union copy 2.sql")
-    q = parse_query(filepath=q, replacement_dict={
-        "date_placeholder": str(cdc_date) if cdc_date is not None else "1=1",
-        "ticker_placeholder": ticker
-    })
+    query_path = "/workspaces/Proyecto-Lab-2/Data/etl/rdz_to_cdz/union copy 2.sql"
+    if cdc_date is not None:
+        q = parse_query(query_path,
+                        replacement_dict={"date_placeholder":cdc_date,"ticker_placeholder":ticker})
+    else:
+        q = parse_query(query_path,
+                        replacement_dict={"Date >= 'date_placeholder'":"1=1","ticker_placeholder":ticker})
     
 except Exception as e:
     sys.exit(e)
@@ -68,7 +70,7 @@ try:
     last_date = str(data.iloc[-1]["Date"])
     conn.insert_data(data=pd.DataFrame(
         {
-            "description":["rdz_to_cdz"],
+            "description":["rdz_to_cdz ^GSPC"],
             "date":[last_date]
         }),
         table_name="cdc",pks=["description"]
