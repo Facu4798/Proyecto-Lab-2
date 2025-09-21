@@ -27,5 +27,3 @@ def get_last_model(ticker,days):
         
     except Exception as e:
         sys.exit(e)
-        
-print(get_last_model("^GSPC",5))
