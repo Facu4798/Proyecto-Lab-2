@@ -9,15 +9,15 @@ SELECT  src.Date,
         (src.Open - src.Close) / src.Open AS retorno_porcentaje,
         ABS(src.High - src.Low) AS amplitud,
         ABS(src.High - src.Low) / src.Open AS amplitud_porcentaje,
-        CPI,
-        Unemployment,
-        Industrial_production,
-        Fed_funds_rate,
-        10_year_treasury,
-        PCE,
-        DFF,
-        Target10,
-        Target5,
-        Target30
+        src.CPI,
+        src.Unemployment,
+        src.Industrial_production,
+        src.Fed_funds_rate,
+        src.10_year_treasury,
+        src.PCE,
+        src.DFF,
+        src.Target10,
+        src.Target5,
+        src.Target30
 FROM curated as src
-WHERE src.Date >= date_placeholder
+WHERE src.Date >= 'date_placeholder'

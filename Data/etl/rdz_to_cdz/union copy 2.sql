@@ -71,9 +71,9 @@ SELECT
     dgs10.Ten_year_treasury as 10_year_treasury,
     pce.PCE as PCE,
     dff.DFF as DFF,
-    targets.MinCloseOver10Days,
-    targets.MinCloseOver5Days,
-    targets.MinCloseOver30Days
+    targets.MinCloseOver10Days as Target5,
+    targets.MinCloseOver5Days as Target10,
+    targets.MinCloseOver30Days as Target30
 FROM stock AS src
 LEFT JOIN targets ON targets.Date = src.Date
 LEFT JOIN cpiaucsl ON cpiaucsl.Date = src.Date
