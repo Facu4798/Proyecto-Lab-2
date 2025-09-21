@@ -1,26 +1,58 @@
+import joblib
+import datetime
+from get_last_model import get_last_model
+from transformar_datos import transformar_datos
+from model_tracking import model_tracking_insert
 
-def generar_prediccion(ticker,
-                        dias,
-                        database,
-                        host,
-                        user,
-                        password,
-                        port,
-                        model_obj):
+def generar_prediccion(modelo,models_dir,train,days,ticker,data):
     
-    from obtener_ultima_fila import obtener_ultima_fila
-    data = obtener_ultima_fila(database, host, user, password, port, ticker)
-    
-    if data.empty:
-        print("No hay datos para generar la predicción.")
-        return None
-    
-    drops = [col for col in data.columns if col.startswith("Target")]
-    # Preprocesar los datos si es necesario
-    data = data.drop(columns=drops)
-    
-    # Realizar la predicción
-    prediccion = model_obj.predict(data)
-    
-    return prediccion[0]  # Retornar el valor de la predicción
+    pred_date = data.tail(1)["Date"].values[0]
 
+    if train:
+        first_date = data.head(1)["Date"].values[0]
+        last_date = data.tail(1)["Date"].values[0]
+
+
+    data = data.drop(columns=["Date","Ticker"])
+
+    data,ctd = transformar_datos(data)
+    data = data.drop(columns=ctd)
+
+    x = data.drop(columns=[i for i in data.columns if i.startswith("Target")])
+    x = x.iloc[:-days,:]
+    y = data[f"Target{days}"]
+    y = y.iloc[:-days]
+
+    if train:
+        n_train = len(y)
+        tt_0 = datetime.datetime.now()
+        modelo.fit(x,y)
+        tt = (datetime.datetime.now() - tt_0).total_seconds()
+
+        now = datetime.datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
+        joblib.dump(modelo,f"{models_dir}modelo_{days}_{ticker}_{now}.joblib")
+    else:
+        modelo = get_last_model(ticker,days)
+        n_train = 0
+        first_date = None
+        last_date = None
+
+    pt_0 = datetime.datetime.now()
+    pred = modelo.predict(x.tail(1))[0]
+    pt = (datetime.datetime.now() - pt_0).total_seconds()
+
+    model_tracking_insert(timestamp=datetime.datetime.now(),
+                        target=days,
+                        ticker=ticker,
+                        nombre_modelo=modelo.__str__(),
+                        n_train=n_train,
+                        n_test=1,
+                        first_date=first_date,
+                        last_date=last_date,
+                        training_time=tt,
+                        prediction_time=pt,
+                        parametros=None,
+                        features=",".join(x.columns),
+                        metrics={"MAE":None})
+
+    return [pred_date, pred]

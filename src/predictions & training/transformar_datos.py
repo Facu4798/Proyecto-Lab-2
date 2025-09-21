@@ -28,7 +28,7 @@ def transformar_datos(df):
 
         
     #pipeline definition
-    p = Pipeline([],verbose=True)
+    p = Pipeline([],verbose=False)
     from add_step import add_step
 
     #back + linear + foward
@@ -224,7 +224,7 @@ def transformar_datos(df):
     # p = add_step(p, 'winsorizer9', winsor9)
 
     print("Pipeline steps loaded successfully.")
-    p = p.fit(df)
+    p.fit(df,y=None)
     print("Pipeline fitted successfully.")
     df = p.transform(df)
     print("Data transformed successfully.")
@@ -234,7 +234,5 @@ def transformar_datos(df):
     for col in df.columns:
         if (df[col] == np.inf).any():
             columns_to_drop.append(col)
-
-    print("Columns with np.inf values:", columns_to_drop)
 
     return df,columns_to_drop
