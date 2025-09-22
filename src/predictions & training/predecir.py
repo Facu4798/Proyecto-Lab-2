@@ -5,6 +5,7 @@ from la_libreria.authentication import Credentials
 from la_libreria.connectors import MySQLConnector
 from la_libreria.utils import parse_query
 from generar_prediccion import generar_prediccion
+from model_template import model_template
 import pandas as pd
 os.system("clear")
 
@@ -16,8 +17,16 @@ train=True
 models_dir = "/workspaces/Proyecto-Lab-2/Models/"
 query_path = "/workspaces/Proyecto-Lab-2/src/predictions & training/queries/"
 
-from sklearn.linear_model import LinearRegression
-M=LinearRegression()
+
+M=model_template(
+    vol="Garch",
+    p=30,
+    q=30,
+    o=0,
+    mean="Zero",
+    rescale=True,
+    exog_cols=None
+)
 
 
 creds = Credentials().load(path="/workspaces/Proyecto-Lab-2/Credentials/db_prod.json")

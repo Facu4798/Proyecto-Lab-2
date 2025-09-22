@@ -4,6 +4,7 @@ from get_last_model import get_last_model
 from transformar_datos import transformar_datos
 from model_tracking import model_tracking_insert
 
+
 def generar_prediccion(modelo,models_dir,train,days,ticker,data):
     
     pred_date = data.tail(1)["Date"].values[0]
@@ -26,7 +27,7 @@ def generar_prediccion(modelo,models_dir,train,days,ticker,data):
     if train:
         n_train = len(y)
         tt_0 = datetime.datetime.now()
-        modelo.fit(x,y)
+        modelo.fit(y=y,x=None)
         tt = (datetime.datetime.now() - tt_0).total_seconds()
 
         now = datetime.datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
@@ -38,7 +39,8 @@ def generar_prediccion(modelo,models_dir,train,days,ticker,data):
         last_date = None
 
     pt_0 = datetime.datetime.now()
-    pred = modelo.predict(x.tail(1))[0]
+    # pred = modelo.predict(x.tail(1))[0]
+    pred = modelo.predict(steps=days, exog_future=None)[-1]
     pt = (datetime.datetime.now() - pt_0).total_seconds()
 
     model_tracking_insert(timestamp=datetime.datetime.now(),
@@ -51,7 +53,7 @@ def generar_prediccion(modelo,models_dir,train,days,ticker,data):
                         last_date=last_date,
                         training_time=tt,
                         prediction_time=pt,
-                        parametros=None,
+                        parametros=modelo.get_params(),
                         features=",".join(x.columns),
                         metrics={"MAE":None})
 
