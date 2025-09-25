@@ -20,9 +20,9 @@ query_path = "/workspaces/Proyecto-Lab-2/src/predictions & training/queries/"
 
 M=model_template(
     vol="Garch",
-    p=30,
-    q=30,
-    o=0,
+    p=1,
+    q=1,
+    o=1,
     mean="Zero",
     rescale=True,
     exog_cols=None
