@@ -29,7 +29,7 @@ M=model_template(
 )
 
 
-creds = Credentials().load(path="/workspaces/Proyecto-Lab-2/Credentials/db_prod.json")
+creds = Credentials().load(path="/workspaces/Proyecto-Lab-2/Credentials/db_dev.json")
 conn = MySQLConnector(creds.dict)
 conn.connect()
 
