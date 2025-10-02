@@ -25,6 +25,10 @@ Para realizar el proyecto se obtuvieron datos de la acción de la API de Yahoo F
 ### Aplicación pretendida
 Se pretende que el modelo se utilize como feature en una aplicación de trading, para que los usuarios puedan consultarlo, y así, informarse sobre el posible riesgo de las acciones en las que pretenden invertir.
 
+### Estrategia de puesta en producción de modelo
+Ante la presencia de predicciones extremas o fuera de lo normal el reemplazo por el modelo del dia anterior con su horizonte de prediccion ajustado a la nueva fecha a predecir.
+
+
 ## Contenidos
 
 A continuación se explican los contenidos de cada una de las carpetas en el proyecto:
