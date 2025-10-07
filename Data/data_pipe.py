@@ -2,11 +2,6 @@ import os
 import sys
 
 
-# script_paths = [
-#        "/workspaces/Proyecto-Lab-2/Data/etl/sor_to_rdz/ingesta.py",
-#        "/workspaces/Proyecto-Lab-2/Data/etl/rdz_to_cdz/curado.py",
-#        "/workspaces/Proyecto-Lab-2/src/predictions & training/predecir.py"
-#     ]
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 current_dir = current_dir.rsplit('Proyecto-Lab-2', 1)[0] + 'Proyecto-Lab-2/'
@@ -18,10 +13,14 @@ sys.path.insert(0, current_dir)
 
 from la_libreria.authentication import Credentials
 from la_libreria.connectors import MySQLConnector
+creds = Credentials().load(path="/workspaces/Proyecto-Lab-2/Credentials/db_dev.json")
+conn = MySQLConnector(creds.dict).connect()
+from Data.etl.sor_to_rdz.ingesta import ingestar
+from Data.etl.rdz_to_cdz.curado import curar
 
-from ..Data.etl.sor_to_rdz.ingesta import *
-from ..Data.etl.rdz_to_cdz.curado import *
-from ..src.predictions_and_training.predecir import *
+
+ingestar()
+curar()
 
 sys.path.pop(0)
 
