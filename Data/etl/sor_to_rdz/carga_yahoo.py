@@ -4,7 +4,7 @@ from la_libreria.authentication import Credentials
 from la_libreria.connectors import MySQLConnector
 from la_libreria.utils import get_ts
 
-def cargar_datos_yahoo(inicio=None, fin=None, ticker='TSLA',credentials=None):
+def cargar_datos_yahoo(inicio=None, fin=None, ticker='TSLA',credentials=None,conn=None):
     import io
     import requests
     import ftplib
@@ -23,7 +23,7 @@ def cargar_datos_yahoo(inicio=None, fin=None, ticker='TSLA',credentials=None):
 
 
     #ingestar los datos de yahoo finance
-    from ingesta_yahoo import obtener_datos_yahoo
+    from Data.etl.sor_to_rdz.ingesta_yahoo import obtener_datos_yahoo
     data_yahoo = obtener_datos_yahoo(
         ticker=ticker,
         start=inicio,
@@ -35,9 +35,9 @@ def cargar_datos_yahoo(inicio=None, fin=None, ticker='TSLA',credentials=None):
     data_yahoo = data_yahoo[["Date","Ticker","Open","High","Low","Close","Volume"]]
     data_yahoo["etl_ts"] = etl_ts
 
-    conn = MySQLConnector(credentials.dict)
-    conn.test_connection()
-    conn.connect()
+    # conn = MySQLConnector(credentials.dict)
+    # conn.test_connection()
+    # conn.connect()
 
     try:
         conn.create_table(
@@ -62,4 +62,4 @@ def cargar_datos_yahoo(inicio=None, fin=None, ticker='TSLA',credentials=None):
         pks=["description"]
     )
 
-    conn.close()
+    #conn.close()

@@ -4,7 +4,7 @@ from la_libreria.authentication import Credentials
 from la_libreria.connectors import MySQLConnector
 from la_libreria.utils import get_ts
 
-def cargar_datos_fred(inicio=None, fin=None, credentials=None):
+def cargar_datos_fred(inicio=None, fin=None, credentials=None,conn=None):
     import io
     import requests
     import ftplib
@@ -21,7 +21,7 @@ def cargar_datos_fred(inicio=None, fin=None, credentials=None):
     etl_ts = get_ts()
 
     #ingestar los datos de FRED
-    from ingesta_fred import obtener_datos_fred
+    from Data.etl.sor_to_rdz.ingesta_fred import obtener_datos_fred
     data_fred = obtener_datos_fred(
         start=inicio,
         end=fin
@@ -35,9 +35,9 @@ def cargar_datos_fred(inicio=None, fin=None, credentials=None):
     data_fred["etl_ts"] = etl_ts
     data_fred.reset_index(drop=True,inplace=True)
 
-    conn = MySQLConnector(credentials.dict)
-    conn.test_connection()
-    conn.connect()
+    # conn = MySQLConnector(credentials.dict)
+    # conn.test_connection()
+    # conn.connect()
 
     try:
         conn.create_table(
@@ -63,5 +63,5 @@ def cargar_datos_fred(inicio=None, fin=None, credentials=None):
         pks=["description"]
     )
 
-    conn.close()
+    #conn.close()
 
