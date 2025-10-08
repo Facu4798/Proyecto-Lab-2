@@ -28,7 +28,26 @@ query = parse_query(query_file, replacement_dict={"Date >= date_placeholder": cd
 try:
     data = conn.get_data(query).drop(columns=["etl_ts"])
 except Exception as e:
-    sys.exit(e)
+    sys.exit("ERROR: " + str(e))
+
+
+#transformar datos
+try:
+    from transformar_datos import transformar_datos
+    data,columns_to_drop = transformar_datos(data)
+    print("transformed data")
+except Exception as e:
+    sys.exit("ERROR: " + str(e))
+
+drop=True
+if drop:
+    try:
+        conn.cursor.execute(f"DROP TABLE IF EXISTS delivery;")
+        conn.connection.commit()
+        print("dropped table")
+    except Exception as e:
+        sys.exit(e)
+
 
 # crear tabla si no existe
 try:
@@ -37,7 +56,7 @@ try:
                       pks=["Date","Ticker"],
                       exceptions={"Volume":"BIGINT"})
 except Exception as e:
-    sys.exit(e)
+    sys.exit("ERROR"+e)
 
 # insertar datos en la tabla
 try:

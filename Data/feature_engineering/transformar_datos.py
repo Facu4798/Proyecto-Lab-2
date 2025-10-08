@@ -26,7 +26,12 @@ def transformar_datos(df):
         os.system('pip install -U feature-engine')
         from feature_engine.outliers import Winsorizer
 
-        
+    #add missing columns
+    if "retorno_porcentaje" not in df.columns:
+        df["retorno_porcentaje"] = (df["Close"]-df["Open"])/df["Open"]
+    if "retorno" not in df.columns:
+        df["retorno"] = df["Close"]-df["Open"]
+
     #pipeline definition
     p = Pipeline([],verbose=False)
     from add_step import add_step
