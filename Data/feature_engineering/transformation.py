@@ -21,8 +21,9 @@ if reset_date:
     conn.connection.commit()
 
 cdc_date = get_cdc_date(f"cdz_to_ddz {ticker}",creds=creds)
-cdc_date = substract_date(str(cdc_date), interval="d",amount=1000)
+
 if cdc_date is not None:
+    cdc_date = substract_date(str(cdc_date), interval="d",amount=1000)
     cdc_date = f"Date >= '{cdc_date}'"
 else:
     cdc_date = "1=1"
