@@ -13,9 +13,12 @@ conn = MySQLConnector(creds.dict)
 conn.connect()
 
 ticker="^GSPC"
+drop=True
+reset_date=True
 
-
-
+if reset_date:
+    conn.cursor.execute(f"update cdc set Date=NULL where Description='cdz_to_ddz {ticker}'")
+    conn.connection.commit()
 
 cdc_date = get_cdc_date(f"cdz_to_ddz {ticker}",creds=creds)
 cdc_date = substract_date(str(cdc_date), interval="d",amount=1000)
@@ -45,7 +48,9 @@ try:
 except Exception as e:
     sys.exit("ERROR: " + str(e))
 
-drop=True
+
+
+
 if drop:
     try:
         conn.cursor.execute(f"DROP TABLE IF EXISTS delivery;")
