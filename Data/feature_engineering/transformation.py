@@ -1,9 +1,12 @@
 from la_libreria.authentication import Credentials
 from la_libreria.connectors import MySQLConnector
 from la_libreria.utils import parse_query
+from la_libreria.utils import substract_date
 from cdc_l3 import get_cdc_date
 import sys
 import pandas as pd
+import os
+os.system('clear')
 
 creds = Credentials().load(path="/workspaces/Proyecto-Lab-2/Credentials/db_dev.json")
 conn = MySQLConnector(creds.dict)
@@ -11,8 +14,11 @@ conn.connect()
 
 ticker="^GSPC"
 
-cdc_date = get_cdc_date(f"cdz_to_ddz {ticker}",creds=creds)
 
+
+
+cdc_date = get_cdc_date(f"cdz_to_ddz {ticker}",creds=creds)
+cdc_date = substract_date(str(cdc_date), interval="d",amount=1000)
 if cdc_date is not None:
     cdc_date = f"Date >= '{cdc_date}'"
 else:
@@ -30,7 +36,7 @@ try:
 except Exception as e:
     sys.exit("ERROR: " + str(e))
 
-
+print(data.shape[0])
 #transformar datos
 try:
     from transformar_datos import transformar_datos
@@ -70,7 +76,7 @@ except Exception as e:
 try:
     conn.insert_data(data=pd.DataFrame(
         {
-            "Description": [f"rdz_to_ddz {ticker}"],
+            "Description": [f"cdz_to_ddz {ticker}"],
             "Date": [str(pd.to_datetime("now"))]
         }
     ),table_name="cdc",pks=["Description"])
