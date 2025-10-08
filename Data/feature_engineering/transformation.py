@@ -13,8 +13,8 @@ conn = MySQLConnector(creds.dict)
 conn.connect()
 
 ticker="^GSPC"
-drop=True
-reset_date=True
+drop=False
+reset_date=False
 
 if reset_date:
     conn.cursor.execute(f"DELETE FROM cdc WHERE Description='cdz_to_ddz {ticker}';")
