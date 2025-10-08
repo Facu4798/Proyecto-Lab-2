@@ -38,7 +38,14 @@ def curar(conn=None,creds=None):
         else:
             q = parse_query(query_path,
                             replacement_dict={"Date >= 'date_placeholder'":"1=1","ticker_placeholder":ticker})
-        
+
+    #añadir los data quality checks
+        query_path_dq = "/workspaces/Proyecto-Lab-2/Data/etl/rdz_to_cdz/dqr.sql"
+        dq = parse_query(query_path_dq)
+        q = dq + "\n" + q.replace("with","").replace("WITH","")\
+            .replace("stock_data","stock_curated").replace("macro_data","macro_curated")
+
+
     except Exception as e:
         sys.exit(e)
 
@@ -51,6 +58,11 @@ def curar(conn=None,creds=None):
         #conn.close()
     except Exception as e:
         sys.exit(e)
+
+
+    # validar datos
+    if len(data)==0:
+        sys.exit("No hay datos nuevos para procesar")
 
 
     # intentar crear la tabla curated
