@@ -17,7 +17,7 @@ drop=True
 reset_date=True
 
 if reset_date:
-    conn.cursor.execute(f"update cdc set Date=NULL where Description='cdz_to_ddz {ticker}'")
+    conn.cursor.execute(f"DELETE FROM cdc WHERE Description='cdz_to_ddz {ticker}';")
     conn.connection.commit()
 
 cdc_date = get_cdc_date(f"cdz_to_ddz {ticker}",creds=creds)
