@@ -37,6 +37,7 @@ def generar_prediccion(modelo,models_dir,train,days,ticker,data):
         n_train = 0
         first_date = None
         last_date = None
+        tt=0
 
     pt_0 = datetime.datetime.now()
     # pred = modelo.predict(x.tail(1))[0]
@@ -56,5 +57,6 @@ def generar_prediccion(modelo,models_dir,train,days,ticker,data):
                         parametros=modelo.get_params(),
                         features=",".join(x.columns),
                         metrics={"MAE":None})
+
 
     return [pred_date, pred]
