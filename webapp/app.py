@@ -5,15 +5,13 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(current_dir)
 
 from flask import Flask, render_template, request, jsonify
-from obtener_datos import obtener_datos
-from la_libreria.authentication import Credentials
-from la_libreria.connectors import MySQLConnector
-creds = Credentials().load(path="/workspaces/Proyecto-Lab-2/Credentials/db_dev.json")
-conn = MySQLConnector(creds.dict)
-conn.connect()
 
 app = Flask(__name__)
 
+def salir_container():
+    print("Deteniendo contenedor...")
+    os.system("docker stop fastapi-container2")
+    os.system("docker rm fastapi-container2")
 
 @app.route("/")
 def index():
@@ -21,32 +19,35 @@ def index():
 
 @app.route("/calcular", methods=["POST"])
 def calcular():
-    query = "SELECT * FROM predicciones ORDER BY Date DESC LIMIT 1"
-    # df = obtener_datos(query, **DB_CONFIG)
-    df = conn.get_data(query)
-    print(df)
-    if df.empty:
-        return jsonify({"error": "No se encontraron datos"}), 404
+    import requests
+    # Iniciar el contenedor
+    print("Iniciando contenedor de la API...")
+    os.system("docker run -d -p 8000:80 --name fastapi-container2 final")
+    import time
+    time.sleep(2)  
+    try:
+        response = requests.get("http://localhost:8000/last-prediction")
+        print(response)
+        if response.status_code != 200:
+            return jsonify({"error": "No se encontraron datos"}), 404
+        datos_api = response.json()
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
-    fila = df.iloc[0]
-
-    def prediction_hash(p)->str:
+    def prediction_hash(p) -> str:
         import numpy as np
-        return str(np.round(p, 2))+"%"
-        
+        return str(np.round(float(p), 2)) + "%"
 
+    datos_api["5Days"] = prediction_hash(datos_api["5Days"])
+    datos_api["10Days"] = prediction_hash(datos_api["10Days"])
+    datos_api["30Days"] = prediction_hash(datos_api["30Days"])
 
-    datos = {
-        "Ticker": fila["Ticker"],
-        "5Days": prediction_hash(fila["5Days"]),
-        "10Days": prediction_hash(fila["10Days"]),
-        "30Days": prediction_hash(fila["30Days"])
-    }
-    print(datos)
+    print("Ejecutando limpieza...")
+    salir_container()
 
-    
-
-    return jsonify(datos)
+    return jsonify(datos_api)
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    print("Iniciando aplicación Flask...")
+    app.run(debug=True, host="0.0.0.0")
+ 
