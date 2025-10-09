@@ -15,7 +15,7 @@ tickers=["^GSPC"]
 days=[5,10,30]
 train=True
 models_dir = "/workspaces/Proyecto-Lab-2/Models/"
-query_path = "/workspaces/Proyecto-Lab-2/src/predictions & training/queries/"
+query_path = "/workspaces/Proyecto-Lab-2/src/predictions_and_training/queries/"
 
 
 M=model_template(
