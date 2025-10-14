@@ -8,11 +8,6 @@ def curar(conn=None,creds=None):
     from Data.etl.rdz_to_cdz.cdc_l2 import get_cdc_date
     os.system("clear")
 
-    # leer las credenciales de la base de datos
-    # try:
-    #     creds = Credentials().load(path="/workspaces/Proyecto-Lab-2/Credentials/db_dev.json")
-    # except: 
-    #     sys.exit("Credentials file not found")
 
 
 
@@ -31,7 +26,7 @@ def curar(conn=None,creds=None):
 
     # leer el archivo de la query
     try:
-        query_path = "/workspaces/Proyecto-Lab-2/Data/etl/rdz_to_cdz/union copy 2.sql"
+        query_path = os.getenv("ENRICHMENT_PATH")
         if cdc_date is not None:
             q = parse_query(query_path,
                             replacement_dict={"date_placeholder":cdc_date,"ticker_placeholder":ticker})
@@ -40,7 +35,7 @@ def curar(conn=None,creds=None):
                             replacement_dict={"Date >= 'date_placeholder'":"1=1","ticker_placeholder":ticker})
 
     #añadir los data quality checks
-        query_path_dq = "/workspaces/Proyecto-Lab-2/Data/etl/rdz_to_cdz/dqr.sql"
+        query_path_dq = os.getenv("DATA_QUALITY_PATH")
         dq = parse_query(query_path_dq)
         q = dq + "\n" + q.replace("with","").replace("WITH","")\
             .replace("stock_data","stock_curated").replace("macro_data","macro_curated")

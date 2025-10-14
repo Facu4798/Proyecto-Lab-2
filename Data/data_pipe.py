@@ -1,6 +1,8 @@
 import os
 import sys
 import time
+import dotenv
+dotenv.load_dotenv(dotenv.find_dotenv("data.env"))
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 current_dir = current_dir.rsplit('Proyecto-Lab-2', 1)[0] + 'Proyecto-Lab-2/'
@@ -14,7 +16,7 @@ from la_libreria.authentication import Credentials
 from la_libreria.connectors import MySQLConnector
 
 startup_time = time.time()
-creds = Credentials().load(path="/workspaces/Proyecto-Lab-2/Credentials/db_dev.json")
+creds = Credentials().load(path=os.getenv("DEV_CREDS"))
 conn = MySQLConnector(creds.dict).connect()
 startup_time = time.time() - startup_time
 # ejecutar los procesos ETL

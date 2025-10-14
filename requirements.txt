@@ -12,4 +12,5 @@ fredapi
 yfinance
 uvicorn
 fastapi
+python-dotenv
 git+https://github.com/Facu4798/the_etl_library.git
