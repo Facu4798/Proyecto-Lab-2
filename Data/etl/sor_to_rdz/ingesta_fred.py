@@ -23,7 +23,7 @@ def obtener_datos_fred(inicators = {
         os.system('pip install pandas')
         import pandas as pd
 
-    fred = Fred(api_key='9eb5b198345d9bbad350ec5794c5d9d0')
+    fred = Fred(api_key=os.getenv("API_KEY"))
 
     # Función para obtener datos de FRED
     def get_fred_data(series_id, frequency='d',start=None,end=None):

@@ -7,6 +7,8 @@ from la_libreria.utils import parse_query
 from generar_prediccion import generar_prediccion
 from model_template import model_template
 import pandas as pd
+import dotenv
+dotenv.load_dotenv(dotenv.find_dotenv("pred.env"))
 os.system("clear")
 
 
@@ -14,8 +16,8 @@ os.system("clear")
 tickers=["^GSPC"]
 days=[5,10,30]
 train=True
-models_dir = "/workspaces/Proyecto-Lab-2/Models/"
-query_path = "/workspaces/Proyecto-Lab-2/src/predictions_and_training/queries/"
+models_dir = os.getenv("MODELS_DIR")
+query_path = os.getenv("QUERIES_DIR")
 
 
 M=model_template(
@@ -29,7 +31,7 @@ M=model_template(
 )
 
 
-creds = Credentials().load(path="/workspaces/Proyecto-Lab-2/Credentials/db_dev.json")
+creds = Credentials().load(path=os.getenv("DEV_CREDS"))
 conn = MySQLConnector(creds.dict)
 conn.connect()
 
@@ -49,16 +51,7 @@ for t in tickers:
 
 try:
     conn.create_table(
-        query= """
-        CREATE TABLE predicciones(
-            Date DATE,
-            Ticker VARCHAR(10),
-            5Days FLOAT,
-            10Days FLOAT,
-            30Days FLOAT,
-            PRIMARY KEY(Date,Ticker)
-        )
-        """
+        query= os.getenv("PREDICCIONES_DDL")
     )
 except Exception as e: print(e)
 
